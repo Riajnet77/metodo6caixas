@@ -1,0 +1,246 @@
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { TrendingUp, TrendingDown, DollarSign, AlertCircle } from 'lucide-react';
+import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const API = `${BACKEND_URL}/api`;
+
+const Dashboard = () => {
+  const [dashboardData, setDashboardData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, [selectedMonth, selectedYear]);
+
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(`${API}/dashboard?month=${selectedMonth}&year=${selectedYear}`);
+      setDashboardData(response.data);
+    } catch (error) {
+      console.error('Erro ao buscar dados do dashboard:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading || !dashboardData) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-500 mx-auto mb-4"></div>
+          <p className="text-gray-600">Carregando...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'ok': return 'text-green-600 bg-green-50 border-green-200';
+      case 'warning': return 'text-yellow-600 bg-yellow-50 border-yellow-200';
+      case 'critical': return 'text-red-600 bg-red-50 border-red-200';
+      default: return 'text-gray-600 bg-gray-50 border-gray-200';
+    }
+  };
+
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case 'ok': return <TrendingUp className="w-5 h-5" />;
+      case 'warning': return <AlertCircle className="w-5 h-5" />;
+      case 'critical': return <TrendingDown className="w-5 h-5" />;
+      default: return null;
+    }
+  };
+
+  // Prepare data for pie chart
+  const pieData = dashboardData.categories_summary.map(cat => ({
+    name: cat.name,
+    value: cat.actual_amount
+  })).filter(item => item.value > 0);
+
+  const COLORS = ['#3B82F6', '#10B981', '#8B5CF6', '#F59E0B', '#EF4444', '#06B6D4'];
+
+  // Prepare data for bar chart
+  const barData = dashboardData.categories_summary.map(cat => ({
+    name: cat.name,
+    Ideal: cat.ideal_amount,
+    Real: cat.actual_amount
+  }));
+
+  const months = [
+    'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+    'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+  ];
+
+  return (
+    <div className="max-w-7xl mx-auto" data-testid="dashboard-page">
+      {/* Header */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2 font-serif">Dashboard Financeiro</h1>
+        <p className="text-gray-600">Visão geral da sua saúde financeira</p>
+      </div>
+
+      {/* Month/Year Selector */}
+      <div className="flex gap-4 mb-6">
+        <select
+          value={selectedMonth}
+          onChange={(e) => setSelectedMonth(Number(e.target.value))}
+          className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+          data-testid="month-selector"
+        >
+          {months.map((month, index) => (
+            <option key={index} value={index + 1}>{month}</option>
+          ))}
+        </select>
+        <select
+          value={selectedYear}
+          onChange={(e) => setSelectedYear(Number(e.target.value))}
+          className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+          data-testid="year-selector"
+        >
+          {[2024, 2025, 2026].map(year => (
+            <option key={year} value={year}>{year}</option>
+          ))}
+        </select>
+      </div>
+
+      {/* KPI Cards */}
+      <div className="grid md:grid-cols-3 gap-6 mb-8">
+        <div className="bg-white rounded-xl p-6 shadow-lg" data-testid="kpi-income">
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-gray-600 text-sm font-medium">Renda Mensal</p>
+            <DollarSign className="w-5 h-5 text-blue-500" />
+          </div>
+          <p className="text-3xl font-bold text-gray-900">
+            R$ {dashboardData.monthly_income.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+          </p>
+        </div>
+
+        <div className="bg-white rounded-xl p-6 shadow-lg" data-testid="kpi-expenses">
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-gray-600 text-sm font-medium">Gastos Totais</p>
+            <TrendingDown className="w-5 h-5 text-red-500" />
+          </div>
+          <p className="text-3xl font-bold text-gray-900">
+            R$ {dashboardData.total_expenses.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+          </p>
+        </div>
+
+        <div className={`rounded-xl p-6 shadow-lg ${
+          dashboardData.balance >= 0 ? 'bg-gradient-to-br from-green-50 to-green-100' : 'bg-gradient-to-br from-red-50 to-red-100'
+        }`} data-testid="kpi-balance">
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-gray-600 text-sm font-medium">Saldo</p>
+            {dashboardData.balance >= 0 ? 
+              <TrendingUp className="w-5 h-5 text-green-600" /> : 
+              <TrendingDown className="w-5 h-5 text-red-600" />
+            }
+          </div>
+          <p className={`text-3xl font-bold ${
+            dashboardData.balance >= 0 ? 'text-green-700' : 'text-red-700'
+          }`}>
+            R$ {Math.abs(dashboardData.balance).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+          </p>
+        </div>
+      </div>
+
+      {/* Charts */}
+      <div className="grid lg:grid-cols-2 gap-8 mb-8">
+        {/* Pie Chart */}
+        <div className="bg-white rounded-xl p-6 shadow-lg">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">Distribuição por Categoria</h2>
+          {pieData.length > 0 ? (
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={pieData}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                  outerRadius={80}
+                  fill="#8884d8"
+                  dataKey="value"
+                >
+                  {pieData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip formatter={(value) => `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`} />
+              </PieChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className="h-64 flex items-center justify-center text-gray-400">
+              <p>Nenhum gasto registrado este mês</p>
+            </div>
+          )}
+        </div>
+
+        {/* Bar Chart */}
+        <div className="bg-white rounded-xl p-6 shadow-lg">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">Ideal vs Real</h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={barData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" angle={-45} textAnchor="end" height={100} />
+              <YAxis />
+              <Tooltip formatter={(value) => `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`} />
+              <Legend />
+              <Bar dataKey="Ideal" fill="#D4AF37" />
+              <Bar dataKey="Real" fill="#3B82F6" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      {/* Category Details */}
+      <div className="bg-white rounded-xl p-6 shadow-lg">
+        <h2 className="text-xl font-bold text-gray-900 mb-4">Detalhamento por Categoria</h2>
+        <div className="space-y-4">
+          {dashboardData.categories_summary.map((category, index) => (
+            <div 
+              key={index} 
+              className={`border rounded-lg p-4 ${getStatusColor(category.status)}`}
+              data-testid={`category-${category.name.toLowerCase().replace(/\s+/g, '-')}`}
+            >
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  {getStatusIcon(category.status)}
+                  <h3 className="font-semibold text-lg">{category.name}</h3>
+                </div>
+                <span className="text-sm font-medium">
+                  {category.actual_percentage.toFixed(1)}% (Ideal: {category.ideal_percentage}%)
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <div>
+                  <p className="text-sm">Real: R$ {category.actual_amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                  <p className="text-sm">Ideal: R$ {category.ideal_amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm font-medium">
+                    Desvio: {category.deviation > 0 ? '+' : ''}{category.deviation.toFixed(1)}%
+                  </p>
+                </div>
+              </div>
+              {/* Progress bar */}
+              <div className="mt-2 bg-white bg-opacity-50 rounded-full h-2 overflow-hidden">
+                <div 
+                  className="h-full bg-current transition-all"
+                  style={{ width: `${Math.min(category.actual_percentage, 100)}%` }}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Dashboard;
