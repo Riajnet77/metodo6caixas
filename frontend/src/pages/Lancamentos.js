@@ -1,0 +1,377 @@
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { Plus, Edit2, Trash2, Save, X } from 'lucide-react';
+
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const API = `${BACKEND_URL}/api`;
+
+const Lancamentos = () => {
+  const [transactions, setTransactions] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [formData, setFormData] = useState({
+    date: new Date().toISOString().split('T')[0],
+    description: '',
+    category: '',
+    amount: '',
+    notes: ''
+  });
+  const [filterMonth, setFilterMonth] = useState(new Date().getMonth() + 1);
+  const [filterYear, setFilterYear] = useState(new Date().getFullYear());
+  const [filterCategory, setFilterCategory] = useState('');
+
+  useEffect(() => {
+    fetchSettings();
+    fetchTransactions();
+  }, [filterMonth, filterYear, filterCategory]);
+
+  const fetchSettings = async () => {
+    try {
+      const response = await axios.get(`${API}/settings`);
+      setCategories(response.data.categories);
+      if (response.data.categories.length > 0 && !formData.category) {
+        setFormData({ ...formData, category: response.data.categories[0].name });
+      }
+    } catch (error) {
+      console.error('Erro ao buscar categorias:', error);
+    }
+  };
+
+  const fetchTransactions = async () => {
+    try {
+      setLoading(true);
+      let url = `${API}/transactions?month=${filterMonth}&year=${filterYear}`;
+      if (filterCategory) {
+        url += `&category=${filterCategory}`;
+      }
+      const response = await axios.get(url);
+      setTransactions(response.data);
+    } catch (error) {
+      console.error('Erro ao buscar transações:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const dataToSend = {
+        ...formData,
+        date: new Date(formData.date + 'T12:00:00').toISOString(),
+        amount: parseFloat(formData.amount)
+      };
+
+      if (editingId) {
+        await axios.put(`${API}/transactions/${editingId}`, dataToSend);
+      } else {
+        await axios.post(`${API}/transactions`, dataToSend);
+      }
+
+      resetForm();
+      fetchTransactions();
+    } catch (error) {
+      console.error('Erro ao salvar transação:', error);
+      alert('Erro ao salvar transação');
+    }
+  };
+
+  const handleEdit = (transaction) => {
+    setFormData({
+      date: new Date(transaction.date).toISOString().split('T')[0],
+      description: transaction.description,
+      category: transaction.category,
+      amount: transaction.amount.toString(),
+      notes: transaction.notes || ''
+    });
+    setEditingId(transaction.id);
+    setShowForm(true);
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm('Tem certeza que deseja excluir esta transação?')) return;
+    
+    try {
+      await axios.delete(`${API}/transactions/${id}`);
+      fetchTransactions();
+    } catch (error) {
+      console.error('Erro ao excluir transação:', error);
+      alert('Erro ao excluir transação');
+    }
+  };
+
+  const resetForm = () => {
+    setFormData({
+      date: new Date().toISOString().split('T')[0],
+      description: '',
+      category: categories[0]?.name || '',
+      amount: '',
+      notes: ''
+    });
+    setEditingId(null);
+    setShowForm(false);
+  };
+
+  const months = [
+    'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+    'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+  ];
+
+  const totalAmount = transactions.reduce((sum, t) => sum + t.amount, 0);
+
+  return (
+    <div className="max-w-6xl mx-auto" data-testid="lancamentos-page">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2 font-serif">Lançamentos</h1>
+          <p className="text-gray-600">Registre suas despesas e acompanhe seus gastos</p>
+        </div>
+        <button
+          onClick={() => setShowForm(!showForm)}
+          className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-500 to-yellow-500 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+          data-testid="add-transaction-button"
+        >
+          {showForm ? <X className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
+          {showForm ? 'Cancelar' : 'Nova Despesa'}
+        </button>
+      </div>
+
+      {/* Form */}
+      {showForm && (
+        <div className="bg-white rounded-xl p-6 shadow-lg mb-6">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">
+            {editingId ? 'Editar Despesa' : 'Nova Despesa'}
+          </h2>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Data</label>
+                <input
+                  type="date"
+                  value={formData.date}
+                  onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                  required
+                  data-testid="transaction-date-input"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Categoria</label>
+                <select
+                  value={formData.category}
+                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                  required
+                  data-testid="transaction-category-input"
+                >
+                  {categories.map((cat, idx) => (
+                    <option key={idx} value={cat.name}>{cat.name}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Descrição</label>
+                <input
+                  type="text"
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                  placeholder="Ex: Compra no supermercado"
+                  required
+                  data-testid="transaction-description-input"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Valor (R$)</label>
+                <input
+                  type="number"
+                  value={formData.amount}
+                  onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                  placeholder="0.00"
+                  step="0.01"
+                  min="0"
+                  required
+                  data-testid="transaction-amount-input"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Observações (opcional)</label>
+              <textarea
+                value={formData.notes}
+                onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                rows="2"
+                placeholder="Anotações adicionais..."
+                data-testid="transaction-notes-input"
+              />
+            </div>
+
+            <div className="flex gap-4">
+              <button
+                type="submit"
+                className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                data-testid="save-transaction-button"
+              >
+                <Save className="w-5 h-5" />
+                {editingId ? 'Atualizar' : 'Salvar'}
+              </button>
+              <button
+                type="button"
+                onClick={resetForm}
+                className="px-6 py-3 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300"
+              >
+                Cancelar
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {/* Filters */}
+      <div className="bg-white rounded-xl p-6 shadow-lg mb-6">
+        <h2 className="text-lg font-bold text-gray-900 mb-4">Filtros</h2>
+        <div className="grid md:grid-cols-3 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Mês</label>
+            <select
+              value={filterMonth}
+              onChange={(e) => setFilterMonth(Number(e.target.value))}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+              data-testid="filter-month"
+            >
+              {months.map((month, index) => (
+                <option key={index} value={index + 1}>{month}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Ano</label>
+            <select
+              value={filterYear}
+              onChange={(e) => setFilterYear(Number(e.target.value))}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+              data-testid="filter-year"
+            >
+              {[2024, 2025, 2026].map(year => (
+                <option key={year} value={year}>{year}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Categoria</label>
+            <select
+              value={filterCategory}
+              onChange={(e) => setFilterCategory(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+              data-testid="filter-category"
+            >
+              <option value="">Todas</option>
+              {categories.map((cat, idx) => (
+                <option key={idx} value={cat.name}>{cat.name}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+      </div>
+
+      {/* Summary */}
+      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 mb-6 border border-blue-100">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm text-gray-600">Total de Despesas</p>
+            <p className="text-3xl font-bold text-gray-900">
+              R$ {totalAmount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+            </p>
+          </div>
+          <div className="text-right">
+            <p className="text-sm text-gray-600">Transações</p>
+            <p className="text-3xl font-bold text-gray-900">{transactions.length}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Transactions List */}
+      <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-gray-50 border-b border-gray-200">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descrição</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Categoria</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Valor</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {loading ? (
+                <tr>
+                  <td colSpan="5" className="px-6 py-12 text-center text-gray-500">
+                    Carregando...
+                  </td>
+                </tr>
+              ) : transactions.length === 0 ? (
+                <tr>
+                  <td colSpan="5" className="px-6 py-12 text-center text-gray-500">
+                    Nenhuma transação encontrada. Adicione sua primeira despesa!
+                  </td>
+                </tr>
+              ) : (
+                transactions.map((transaction) => (
+                  <tr key={transaction.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {new Date(transaction.date).toLocaleDateString('pt-BR')}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-900">
+                      {transaction.description}
+                      {transaction.notes && (
+                        <p className="text-xs text-gray-500 mt-1">{transaction.notes}</p>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                        {transaction.category}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
+                      R$ {transaction.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleEdit(transaction)}
+                          className="text-blue-600 hover:text-blue-800"
+                          data-testid={`edit-transaction-${transaction.id}`}
+                        >
+                          <Edit2 className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(transaction.id)}
+                          className="text-red-600 hover:text-red-800"
+                          data-testid={`delete-transaction-${transaction.id}`}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Lancamentos;
