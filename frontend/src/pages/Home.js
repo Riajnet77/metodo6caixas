@@ -11,9 +11,9 @@ const Home = () => {
           <span className="text-amber-700 font-semibold text-sm">Transforme Sua Realidade Financeira</span>
         </div>
         <h1 className="text-4xl lg:text-6xl font-bold text-gray-900 mb-6 font-serif">
-          O Hábito da Economia &<br />
+          O Hábito da Economia<br />
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-600 to-yellow-500">
-            Gestão Financeira Bíblica
+            e Gestão Financeira
           </span>
         </h1>
         <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
