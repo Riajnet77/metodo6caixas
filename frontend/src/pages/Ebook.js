@@ -209,8 +209,8 @@ const Ebook = () => {
           <span className="text-amber-700 font-semibold">Conteúdo Completo</span>
         </div>
         <h1 className="text-4xl font-bold text-gray-900 mb-4 font-serif">
-          O Hábito da Economia &<br />
-          Gestão Financeira Bíblica
+          O Hábito da Economia<br />
+          e Gestão Financeira
         </h1>
         <p className="text-xl text-gray-600">
           Princípios eternos para prosperidade duradoura
