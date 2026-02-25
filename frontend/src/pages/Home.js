@@ -8,17 +8,17 @@ const Home = () => {
       {/* Hero Section */}
       <div className="text-center py-12 lg:py-20">
         <div className="inline-block mb-4 px-4 py-2 bg-amber-100 rounded-full">
-          <span className="text-amber-700 font-semibold text-sm">Prosperidade com Propósito</span>
+          <span className="text-amber-700 font-semibold text-sm">Transforme Sua Realidade Financeira</span>
         </div>
         <h1 className="text-4xl lg:text-6xl font-bold text-gray-900 mb-6 font-serif">
-          Mente Milionária &<br />
+          O Hábito da Economia &<br />
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-600 to-yellow-500">
-            Finanças Bíblicas
+            Gestão Financeira Bíblica
           </span>
         </h1>
         <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-          Transforme sua relação com o dinheiro combinando princípios de sucesso
-          com sabedoria bíblica
+          Aprenda a criar hábitos financeiros sólidos que transformam pensamentos em prosperidade,
+          baseados em princípios eternos e sabedoria prática
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link
@@ -26,7 +26,7 @@ const Home = () => {
             className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-yellow-500 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1"
             data-testid="comecar-button"
           >
-            Começar Agora
+            Iniciar Jornada
             <ArrowRight className="w-5 h-5" />
           </Link>
           <Link
@@ -35,31 +35,31 @@ const Home = () => {
             data-testid="ebook-button"
           >
             <BookOpen className="w-5 h-5" />
-            Ler o Ebook
+            Ler Conteúdo Completo
           </Link>
         </div>
       </div>
 
-      {/* Bible Verse */}
+      {/* Wisdom Quote */}
       <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-8 mb-12 border border-blue-100">
         <p className="text-center text-lg text-gray-700 italic font-serif">
-          "Os planos bem elaborados levam à fartura;<br />
-          o apressado acaba na miséria."
+          "Os pensamentos dos diligentes conduzem à abundância,<br />
+          pois eles trabalham corretamente com um propósito claro."
         </p>
         <p className="text-center text-sm text-blue-600 font-semibold mt-2">
-          Provérbios 21:5
+          Provérbios 21:5 - Princípio do Rei Salomão
         </p>
       </div>
 
-      {/* Features */}
+      {/* Core Concepts */}
       <div className="grid md:grid-cols-3 gap-8 mb-12">
         <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl card-hover">
           <div className="w-12 h-12 bg-gradient-to-br from-green-400 to-green-600 rounded-lg flex items-center justify-center mb-4">
             <TrendingUp className="w-6 h-6 text-white" />
           </div>
-          <h3 className="text-xl font-bold text-gray-900 mb-2">Dashboard Interativo</h3>
+          <h3 className="text-xl font-bold text-gray-900 mb-2">Hábitos que Prosperam</h3>
           <p className="text-gray-600">
-            Visualize sua saúde financeira em tempo real com gráficos e indicadores claros
+            Economizar é uma questão de hábito. Pela repetição, forme o piloto automático da prosperidade
           </p>
         </div>
 
@@ -67,9 +67,9 @@ const Home = () => {
           <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-yellow-600 rounded-lg flex items-center justify-center mb-4">
             <Target className="w-6 h-6 text-white" />
           </div>
-          <h3 className="text-xl font-bold text-gray-900 mb-2">Metas com Propósito</h3>
+          <h3 className="text-xl font-bold text-gray-900 mb-2">Objetivos e Metas Claras</h3>
           <p className="text-gray-600">
-            Defina objetivos financeiros alinhados com seus valores e acompanhe o progresso
+            Pensamentos geram emoções, emoções geram crenças, crenças geram ações que criam resultados
           </p>
         </div>
 
@@ -77,18 +77,21 @@ const Home = () => {
           <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-indigo-600 rounded-lg flex items-center justify-center mb-4">
             <Heart className="w-6 h-6 text-white" />
           </div>
-          <h3 className="text-xl font-bold text-gray-900 mb-2">Sabedoria Bíblica</h3>
+          <h3 className="text-xl font-bold text-gray-900 mb-2">Sabedoria de Salomão</h3>
           <p className="text-gray-600">
-            Aprenda princípios eternos sobre mordomia, generosidade e prosperidade
+            Aplique os 10 princípios bíblicos de finanças do homem mais próspero da história
           </p>
         </div>
       </div>
 
-      {/* Categories Preview */}
+      {/* 6 Categories System */}
       <div className="bg-white rounded-xl p-8 shadow-lg mb-12">
         <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center font-serif">
-          6 Categorias para Equilíbrio Financeiro
+          Sistema de 6 Categorias para Gestão Financeira
         </h2>
+        <p className="text-center text-gray-600 mb-8">
+          Divida sua renda de forma inteligente e equilibrada
+        </p>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           <div className="flex items-start gap-3">
             <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -96,7 +99,7 @@ const Home = () => {
             </div>
             <div>
               <h4 className="font-semibold text-gray-900">Viver</h4>
-              <p className="text-sm text-gray-600">Moradia, alimentação, transporte</p>
+              <p className="text-sm text-gray-600">Ajuste todas as despesas do cotidiano com 50% dos ganhos mensais</p>
             </div>
           </div>
 
@@ -106,7 +109,7 @@ const Home = () => {
             </div>
             <div>
               <h4 className="font-semibold text-gray-900">Liberdade Financeira</h4>
-              <p className="text-sm text-gray-600">Investimentos</p>
+              <p className="text-sm text-gray-600">Pague-se primeiro! Poupe para aumentar rendimentos</p>
             </div>
           </div>
 
@@ -116,7 +119,7 @@ const Home = () => {
             </div>
             <div>
               <h4 className="font-semibold text-gray-900">Longo Prazo</h4>
-              <p className="text-sm text-gray-600">Poupança para sonhos</p>
+              <p className="text-sm text-gray-600">Imóvel próprio, veículo, reforma, férias</p>
             </div>
           </div>
 
@@ -126,7 +129,7 @@ const Home = () => {
             </div>
             <div>
               <h4 className="font-semibold text-gray-900">Educação</h4>
-              <p className="text-sm text-gray-600">Cursos, livros</p>
+              <p className="text-sm text-gray-600">Invista em conhecimentos para ganhar mais</p>
             </div>
           </div>
 
@@ -136,7 +139,7 @@ const Home = () => {
             </div>
             <div>
               <h4 className="font-semibold text-gray-900">Doação</h4>
-              <p className="text-sm text-gray-600">Dízimo, ofertas, projetos</p>
+              <p className="text-sm text-gray-600">É dando que se recebe - Lei universal</p>
             </div>
           </div>
 
@@ -146,8 +149,91 @@ const Home = () => {
             </div>
             <div>
               <h4 className="font-semibold text-gray-900">Lazer</h4>
-              <p className="text-sm text-gray-600">Entretenimento, viagens</p>
+              <p className="text-sm text-gray-600">Gaste com você, sem culpa, sinta-se próspero</p>
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Key Principles */}
+      <div className="bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl p-8 mb-12 border border-amber-200">
+        <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center font-serif">
+          Princípios Fundamentais
+        </h2>
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="flex items-start gap-3">
+            <div className="w-8 h-8 bg-amber-500 text-white rounded-full flex items-center justify-center flex-shrink-0 font-bold">
+              1
+            </div>
+            <div>
+              <h4 className="font-semibold text-gray-900 mb-1">Formação do Hábito</h4>
+              <p className="text-sm text-gray-700">
+                O hábito de economizar, no início, é mais importante do que o próprio valor economizado
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-3">
+            <div className="w-8 h-8 bg-amber-500 text-white rounded-full flex items-center justify-center flex-shrink-0 font-bold">
+              2
+            </div>
+            <div>
+              <h4 className="font-semibold text-gray-900 mb-1">Poder do Pensamento</h4>
+              <p className="text-sm text-gray-700">
+                Pensamentos criam emoções, sentimentos, crenças, ações e resultados
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-3">
+            <div className="w-8 h-8 bg-amber-500 text-white rounded-full flex items-center justify-center flex-shrink-0 font-bold">
+              3
+            </div>
+            <div>
+              <h4 className="font-semibold text-gray-900 mb-1">Diligência</h4>
+              <p className="text-sm text-gray-700">
+                Seja cuidadoso, zeloso, pesquisador - busque a excelência em tudo
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-3">
+            <div className="w-8 h-8 bg-amber-500 text-white rounded-full flex items-center justify-center flex-shrink-0 font-bold">
+              4
+            </div>
+            <div>
+              <h4 className="font-semibold text-gray-900 mb-1">Generosidade</h4>
+              <p className="text-sm text-gray-700">
+                A pessoa generosa terá sempre mais, recebendo de volta o bem que faz
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Three Ways to Earn */}
+      <div className="bg-white rounded-xl p-8 shadow-lg mb-12">
+        <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center font-serif">
+          Três Formas de Ganhar Dinheiro
+        </h2>
+        <div className="space-y-4">
+          <div className="p-4 bg-green-50 rounded-lg border-l-4 border-green-500">
+            <h4 className="font-bold text-green-900 mb-2">💵 Ajude pessoas a ganharem dinheiro</h4>
+            <p className="text-gray-700 text-sm">
+              Seja o melhor no que faz, estruture um curso e compartilhe conhecimento
+            </p>
+          </div>
+          <div className="p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500">
+            <h4 className="font-bold text-blue-900 mb-2">🔧 Ajude pessoas a resolver problemas</h4>
+            <p className="text-gray-700 text-sm">
+              Resolvendo problemas alheios você pode ganhar muito - você só recebe aquilo que dá
+            </p>
+          </div>
+          <div className="p-4 bg-purple-50 rounded-lg border-l-4 border-purple-500">
+            <h4 className="font-bold text-purple-900 mb-2">🌟 Ajude na autoconfiança e autoconhecimento</h4>
+            <p className="text-gray-700 text-sm">
+              Ensine leis universais, incentive pessoas - quando você ensina, aprende muito mais
+            </p>
           </div>
         </div>
       </div>
@@ -155,17 +241,17 @@ const Home = () => {
       {/* CTA */}
       <div className="text-center py-12">
         <h2 className="text-3xl font-bold text-gray-900 mb-4 font-serif">
-          Pronto para Transformar suas Finanças?
+          Pronto para Criar o Hábito da Prosperidade?
         </h2>
         <p className="text-gray-600 mb-8">
-          Comece hoje sua jornada rumo à prosperidade com propósito
+          "Todo resultado que você deseja na sua vida está naquilo que você ainda não aprendeu"
         </p>
         <Link
           to="/configuracoes"
           className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1"
           data-testid="configurar-button"
         >
-          Configurar Minha Renda
+          Configurar Minha Renda Agora
           <ArrowRight className="w-5 h-5" />
         </Link>
       </div>
