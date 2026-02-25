@@ -162,7 +162,7 @@ async def get_or_create_settings() -> UserSettings:
 
 @api_router.get("/")
 async def root():
-    return {"message": "Mente Milionária & Finanças Bíblicas API"}
+    return {"message": "O Hábito da Economia e Gestão Financeira API"}
 
 # Settings Routes
 @api_router.get("/settings", response_model=UserSettings)
