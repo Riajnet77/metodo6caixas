@@ -543,7 +543,13 @@ async def get_dashboard(
         actual_amount = category_totals.get(cat.name, 0.0)
         ideal_amount = settings.monthly_income * (cat.ideal_percentage / 100)
         actual_percentage = (actual_amount / settings.monthly_income * 100) if settings.monthly_income > 0 else 0
-        deviation = actual_percentage - cat.ideal_percentage
+        
+        # Nova fórmula: Variação % = ((Real - Ideal) / Ideal) × 100
+        if ideal_amount > 0:
+            deviation = ((actual_amount - ideal_amount) / ideal_amount) * 100
+        else:
+            deviation = 0.0
+        
         status = calculate_status(actual_percentage, cat.ideal_percentage)
         
         categories_summary.append(CategorySummary(
