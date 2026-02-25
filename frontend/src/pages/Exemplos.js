@@ -66,7 +66,7 @@ const Exemplos = () => {
 
   const inicianteTotal = inicianteData ? calculateTotal(inicianteData.transactions) : 0;
   const veteranoTotal = veteranoData ? calculateTotal(veteranoData.transactions) : 0;
-  const iniciante Pie = inicianteData ? preparePieData(inicianteData.transactions) : [];
+  const iniciantePie = inicianteData ? preparePieData(inicianteData.transactions) : [];
   const veteranoPie = veteranoData ? preparePieData(veteranoData.transactions) : [];
 
   return (
