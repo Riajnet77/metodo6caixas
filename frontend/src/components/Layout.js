@@ -93,7 +93,28 @@ const Layout = () => {
           </nav>
 
           {/* Footer */}
-          <div className="p-4 border-t border-gray-200">
+          <div className="p-4 border-t border-gray-200 space-y-3">
+            {/* User Info */}
+            {user && (
+              <div className="bg-gradient-to-br from-gray-50 to-gray-100 p-3 rounded-lg">
+                <div className="flex items-center gap-2 mb-2">
+                  <User className="w-4 h-4 text-gray-600" />
+                  <span className="text-sm font-semibold text-gray-900">{user.full_name}</span>
+                </div>
+                <p className="text-xs text-gray-600">{user.email}</p>
+                <p className="text-xs text-amber-600 font-medium mt-1">{user.company_name}</p>
+              </div>
+            )}
+
+            {/* Logout Button */}
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-all"
+            >
+              <LogOut className="w-5 h-5" />
+              <span className="font-medium">Sair</span>
+            </button>
+
             <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-4 rounded-lg">
               <p className="text-xs text-gray-600 italic">
                 "Os planos bem elaborados levam à fartura"<br />
