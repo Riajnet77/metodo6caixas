@@ -1,15 +1,22 @@
-from fastapi import FastAPI, APIRouter, HTTPException
+from fastapi import FastAPI, APIRouter, HTTPException, Depends
+from fastapi.security import OAuth2PasswordRequestForm
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
 from pathlib import Path
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, Field, ConfigDict, EmailStr
 from typing import List, Optional, Dict
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from collections import defaultdict
+
+# Import authentication functions
+from auth import (
+    Token, TokenData, User, UserInDB, UserCreate, UserLogin,
+    verify_password, get_password_hash, create_access_token, get_current_user
+)
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -22,8 +29,9 @@ db = client[os.environ['DB_NAME']]
 # Create the main app without a prefix
 app = FastAPI()
 
-# Create a router with the /api prefix
+# Create routers
 api_router = APIRouter(prefix="/api")
+auth_router = APIRouter(prefix="/api/auth", tags=["authentication"])
 
 # Default categories with ideal percentages
 DEFAULT_CATEGORIES = [
@@ -45,7 +53,8 @@ class Category(BaseModel):
 class UserSettings(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    user_id: str = "default_user"  # For MVP, single user
+    user_id: str
+    company_id: str
     monthly_income: float
     categories: List[Category] = Field(default_factory=lambda: [Category(**cat) for cat in DEFAULT_CATEGORIES])
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
@@ -62,7 +71,8 @@ class UserSettingsUpdate(BaseModel):
 class Transaction(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    user_id: str = "default_user"
+    user_id: str
+    company_id: str
     date: datetime
     description: str
     category: str
@@ -89,7 +99,8 @@ class TransactionUpdate(BaseModel):
 class Goal(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    user_id: str = "default_user"
+    user_id: str
+    company_id: str
     name: str
     category: str
     target_amount: float
@@ -117,7 +128,7 @@ class CategorySummary(BaseModel):
     actual_amount: float
     actual_percentage: float
     deviation: float
-    status: str  # "ok", "warning", "critical"
+    status: str
 
 class DashboardData(BaseModel):
     monthly_income: float
@@ -132,18 +143,20 @@ class DashboardData(BaseModel):
 def calculate_status(actual_percentage: float, ideal_percentage: float) -> str:
     """Calculate status based on deviation from ideal"""
     if actual_percentage <= ideal_percentage * 0.9:
-        return "ok"  # Under budget
+        return "ok"
     elif actual_percentage <= ideal_percentage:
-        return "warning"  # Close to limit
+        return "warning"
     else:
-        return "critical"  # Over budget
+        return "critical"
 
-async def get_or_create_settings() -> UserSettings:
+async def get_or_create_settings(user_id: str, company_id: str) -> UserSettings:
     """Get existing settings or create default ones"""
-    settings_doc = await db.user_settings.find_one({"user_id": "default_user"}, {"_id": 0})
+    settings_doc = await db.user_settings.find_one(
+        {"user_id": user_id, "company_id": company_id}, 
+        {"_id": 0}
+    )
     
     if settings_doc:
-        # Convert ISO strings back to datetime
         if isinstance(settings_doc.get('created_at'), str):
             settings_doc['created_at'] = datetime.fromisoformat(settings_doc['created_at'])
         if isinstance(settings_doc.get('updated_at'), str):
@@ -151,14 +164,109 @@ async def get_or_create_settings() -> UserSettings:
         return UserSettings(**settings_doc)
     
     # Create default settings
-    default_settings = UserSettings(monthly_income=5000.0)
+    default_settings = UserSettings(
+        user_id=user_id,
+        company_id=company_id,
+        monthly_income=5000.0
+    )
     doc = default_settings.model_dump()
     doc['created_at'] = doc['created_at'].isoformat()
     doc['updated_at'] = doc['updated_at'].isoformat()
     await db.user_settings.insert_one(doc)
     return default_settings
 
-# ==================== ROUTES ====================
+# ==================== AUTHENTICATION ROUTES ====================
+
+@auth_router.post("/register", response_model=Token)
+async def register(user_data: UserCreate):
+    """Register a new user"""
+    # Check if user already exists
+    existing_user = await db.users.find_one({"email": user_data.email})
+    if existing_user:
+        raise HTTPException(
+            status_code=400,
+            detail="Email já cadastrado"
+        )
+    
+    # Create company_id from company name
+    company_id = str(uuid.uuid4())
+    
+    # Create user
+    user = UserInDB(
+        id=str(uuid.uuid4()),
+        email=user_data.email,
+        full_name=user_data.full_name,
+        company_id=company_id,
+        company_name=user_data.company_name,
+        hashed_password=get_password_hash(user_data.password),
+        is_active=True,
+        created_at=datetime.now(timezone.utc)
+    )
+    
+    # Save to database
+    user_dict = user.model_dump()
+    user_dict['created_at'] = user_dict['created_at'].isoformat()
+    await db.users.insert_one(user_dict)
+    
+    # Create access token
+    access_token = create_access_token(
+        data={
+            "sub": user.id,
+            "email": user.email,
+            "company_id": user.company_id
+        }
+    )
+    
+    return Token(access_token=access_token, token_type="bearer")
+
+@auth_router.post("/login", response_model=Token)
+async def login(form_data: OAuth2PasswordRequestForm = Depends()):
+    """Login user"""
+    # Find user
+    user_doc = await db.users.find_one({"email": form_data.username})
+    if not user_doc:
+        raise HTTPException(
+            status_code=401,
+            detail="Email ou senha incorretos"
+        )
+    
+    # Convert dates
+    if isinstance(user_doc.get('created_at'), str):
+        user_doc['created_at'] = datetime.fromisoformat(user_doc['created_at'])
+    
+    user = UserInDB(**user_doc)
+    
+    # Verify password
+    if not verify_password(form_data.password, user.hashed_password):
+        raise HTTPException(
+            status_code=401,
+            detail="Email ou senha incorretos"
+        )
+    
+    # Create access token
+    access_token = create_access_token(
+        data={
+            "sub": user.id,
+            "email": user.email,
+            "company_id": user.company_id
+        }
+    )
+    
+    return Token(access_token=access_token, token_type="bearer")
+
+@auth_router.get("/me", response_model=User)
+async def get_me(current_user: TokenData = Depends(get_current_user)):
+    """Get current user info"""
+    user_doc = await db.users.find_one({"id": current_user.user_id}, {"_id": 0, "hashed_password": 0})
+    if not user_doc:
+        raise HTTPException(status_code=404, detail="Usuário não encontrado")
+    
+    if isinstance(user_doc.get('created_at'), str):
+        user_doc['created_at'] = datetime.fromisoformat(user_doc['created_at'])
+    
+    return User(**user_doc)
+
+# ==================== PROTECTED ROUTES ====================
 
 @api_router.get("/")
 async def root():
@@ -166,39 +274,15 @@ async def root():
 
 # Settings Routes
 @api_router.get("/settings", response_model=UserSettings)
-async def get_settings():
-    return await get_or_create_settings()
-
-@api_router.post("/settings", response_model=UserSettings)
-async def create_settings(input: UserSettingsCreate):
-    # Check if settings already exist
-    existing = await db.user_settings.find_one({"user_id": "default_user"})
-    if existing:
-        raise HTTPException(status_code=400, detail="Settings already exist. Use PUT to update.")
-    
-    categories = input.categories if input.categories else [Category(**cat) for cat in DEFAULT_CATEGORIES]
-    settings = UserSettings(monthly_income=input.monthly_income, categories=categories)
-    
-    doc = settings.model_dump()
-    doc['created_at'] = doc['created_at'].isoformat()
-    doc['updated_at'] = doc['updated_at'].isoformat()
-    
-    await db.user_settings.insert_one(doc)
-    return settings
+async def get_settings(current_user: TokenData = Depends(get_current_user)):
+    return await get_or_create_settings(current_user.user_id, current_user.company_id)
 
 @api_router.put("/settings", response_model=UserSettings)
-async def update_settings(input: UserSettingsUpdate):
-    existing_doc = await db.user_settings.find_one({"user_id": "default_user"}, {"_id": 0})
-    if not existing_doc:
-        raise HTTPException(status_code=404, detail="Settings not found")
-    
-    # Convert ISO strings back to datetime
-    if isinstance(existing_doc.get('created_at'), str):
-        existing_doc['created_at'] = datetime.fromisoformat(existing_doc['created_at'])
-    if isinstance(existing_doc.get('updated_at'), str):
-        existing_doc['updated_at'] = datetime.fromisoformat(existing_doc['updated_at'])
-    
-    settings = UserSettings(**existing_doc)
+async def update_settings(
+    input: UserSettingsUpdate,
+    current_user: TokenData = Depends(get_current_user)
+):
+    settings = await get_or_create_settings(current_user.user_id, current_user.company_id)
     
     if input.monthly_income is not None:
         settings.monthly_income = input.monthly_income
@@ -212,16 +296,22 @@ async def update_settings(input: UserSettingsUpdate):
     doc['updated_at'] = doc['updated_at'].isoformat()
     
     await db.user_settings.update_one(
-        {"user_id": "default_user"},
-        {"$set": doc}
+        {"user_id": current_user.user_id, "company_id": current_user.company_id},
+        {"$set": doc},
+        upsert=True
     )
     
     return settings
 
 # Transaction Routes
 @api_router.get("/transactions", response_model=List[Transaction])
-async def get_transactions(month: Optional[int] = None, year: Optional[int] = None, category: Optional[str] = None):
-    query = {"user_id": "default_user"}
+async def get_transactions(
+    month: Optional[int] = None,
+    year: Optional[int] = None,
+    category: Optional[str] = None,
+    current_user: TokenData = Depends(get_current_user)
+):
+    query = {"user_id": current_user.user_id, "company_id": current_user.company_id}
     
     if month is not None:
         query["month"] = month
@@ -241,8 +331,13 @@ async def get_transactions(month: Optional[int] = None, year: Optional[int] = No
     return transactions
 
 @api_router.post("/transactions", response_model=Transaction)
-async def create_transaction(input: TransactionCreate):
+async def create_transaction(
+    input: TransactionCreate,
+    current_user: TokenData = Depends(get_current_user)
+):
     transaction = Transaction(
+        user_id=current_user.user_id,
+        company_id=current_user.company_id,
         date=input.date,
         description=input.description,
         category=input.category,
@@ -260,10 +355,19 @@ async def create_transaction(input: TransactionCreate):
     return transaction
 
 @api_router.put("/transactions/{transaction_id}", response_model=Transaction)
-async def update_transaction(transaction_id: str, input: TransactionUpdate):
-    existing_doc = await db.transactions.find_one({"id": transaction_id, "user_id": "default_user"}, {"_id": 0})
+async def update_transaction(
+    transaction_id: str,
+    input: TransactionUpdate,
+    current_user: TokenData = Depends(get_current_user)
+):
+    existing_doc = await db.transactions.find_one({
+        "id": transaction_id,
+        "user_id": current_user.user_id,
+        "company_id": current_user.company_id
+    }, {"_id": 0})
+    
     if not existing_doc:
-        raise HTTPException(status_code=404, detail="Transaction not found")
+        raise HTTPException(status_code=404, detail="Transação não encontrada")
     
     if isinstance(existing_doc.get('date'), str):
         existing_doc['date'] = datetime.fromisoformat(existing_doc['date'])
@@ -290,26 +394,36 @@ async def update_transaction(transaction_id: str, input: TransactionUpdate):
     doc['created_at'] = doc['created_at'].isoformat()
     
     await db.transactions.update_one(
-        {"id": transaction_id},
+        {"id": transaction_id, "company_id": current_user.company_id},
         {"$set": doc}
     )
     
     return transaction
 
 @api_router.delete("/transactions/{transaction_id}")
-async def delete_transaction(transaction_id: str):
-    result = await db.transactions.delete_one({"id": transaction_id, "user_id": "default_user"})
+async def delete_transaction(
+    transaction_id: str,
+    current_user: TokenData = Depends(get_current_user)
+):
+    result = await db.transactions.delete_one({
+        "id": transaction_id,
+        "user_id": current_user.user_id,
+        "company_id": current_user.company_id
+    })
     if result.deleted_count == 0:
-        raise HTTPException(status_code=404, detail="Transaction not found")
-    return {"message": "Transaction deleted successfully"}
+        raise HTTPException(status_code=404, detail="Transação não encontrada")
+    return {"message": "Transação excluída com sucesso"}
 
 # Goal Routes
 @api_router.get("/goals", response_model=List[Goal])
-async def get_goals():
-    goals = await db.goals.find({"user_id": "default_user"}, {"_id": 0}).to_list(100)
+async def get_goals(current_user: TokenData = Depends(get_current_user)):
+    goals = await db.goals.find({
+        "user_id": current_user.user_id,
+        "company_id": current_user.company_id
+    }, {"_id": 0}).to_list(100)
     
     for goal in goals:
-        if isinstance(goal.get('deadline'), str):
+        if isinstance(goal.get('deadline'), str) and goal.get('deadline'):
             goal['deadline'] = datetime.fromisoformat(goal['deadline'])
         if isinstance(goal.get('created_at'), str):
             goal['created_at'] = datetime.fromisoformat(goal['created_at'])
@@ -317,8 +431,13 @@ async def get_goals():
     return goals
 
 @api_router.post("/goals", response_model=Goal)
-async def create_goal(input: GoalCreate):
+async def create_goal(
+    input: GoalCreate,
+    current_user: TokenData = Depends(get_current_user)
+):
     goal = Goal(
+        user_id=current_user.user_id,
+        company_id=current_user.company_id,
         name=input.name,
         category=input.category,
         target_amount=input.target_amount,
@@ -334,10 +453,19 @@ async def create_goal(input: GoalCreate):
     return goal
 
 @api_router.put("/goals/{goal_id}", response_model=Goal)
-async def update_goal(goal_id: str, input: GoalUpdate):
-    existing_doc = await db.goals.find_one({"id": goal_id, "user_id": "default_user"}, {"_id": 0})
+async def update_goal(
+    goal_id: str,
+    input: GoalUpdate,
+    current_user: TokenData = Depends(get_current_user)
+):
+    existing_doc = await db.goals.find_one({
+        "id": goal_id,
+        "user_id": current_user.user_id,
+        "company_id": current_user.company_id
+    }, {"_id": 0})
+    
     if not existing_doc:
-        raise HTTPException(status_code=404, detail="Goal not found")
+        raise HTTPException(status_code=404, detail="Meta não encontrada")
     
     if isinstance(existing_doc.get('deadline'), str) and existing_doc.get('deadline'):
         existing_doc['deadline'] = datetime.fromisoformat(existing_doc['deadline'])
@@ -363,38 +491,46 @@ async def update_goal(goal_id: str, input: GoalUpdate):
     doc['created_at'] = doc['created_at'].isoformat()
     
     await db.goals.update_one(
-        {"id": goal_id},
+        {"id": goal_id, "company_id": current_user.company_id},
         {"$set": doc}
     )
     
     return goal
 
 @api_router.delete("/goals/{goal_id}")
-async def delete_goal(goal_id: str):
-    result = await db.goals.delete_one({"id": goal_id, "user_id": "default_user"})
+async def delete_goal(
+    goal_id: str,
+    current_user: TokenData = Depends(get_current_user)
+):
+    result = await db.goals.delete_one({
+        "id": goal_id,
+        "user_id": current_user.user_id,
+        "company_id": current_user.company_id
+    })
     if result.deleted_count == 0:
-        raise HTTPException(status_code=404, detail="Goal not found")
-    return {"message": "Goal deleted successfully"}
+        raise HTTPException(status_code=404, detail="Meta não encontrada")
+    return {"message": "Meta excluída com sucesso"}
 
 # Dashboard Route
 @api_router.get("/dashboard", response_model=DashboardData)
-async def get_dashboard(month: Optional[int] = None, year: Optional[int] = None):
-    # Use current month/year if not provided
+async def get_dashboard(
+    month: Optional[int] = None,
+    year: Optional[int] = None,
+    current_user: TokenData = Depends(get_current_user)
+):
     now = datetime.now()
     target_month = month if month is not None else now.month
     target_year = year if year is not None else now.year
     
-    # Get settings
-    settings = await get_or_create_settings()
+    settings = await get_or_create_settings(current_user.user_id, current_user.company_id)
     
-    # Get transactions for the specified month
     transactions = await db.transactions.find({
-        "user_id": "default_user",
+        "user_id": current_user.user_id,
+        "company_id": current_user.company_id,
         "month": target_month,
         "year": target_year
     }, {"_id": 0}).to_list(1000)
     
-    # Calculate totals by category
     category_totals = defaultdict(float)
     total_expenses = 0.0
     
@@ -402,7 +538,6 @@ async def get_dashboard(month: Optional[int] = None, year: Optional[int] = None)
         category_totals[trans['category']] += trans['amount']
         total_expenses += trans['amount']
     
-    # Build category summaries
     categories_summary = []
     for cat in settings.categories:
         actual_amount = category_totals.get(cat.name, 0.0)
@@ -432,7 +567,7 @@ async def get_dashboard(month: Optional[int] = None, year: Optional[int] = None)
         year=target_year
     )
 
-# Example data route
+# Example data route (public - no authentication required)
 @api_router.get("/examples/{profile_type}")
 async def get_example_data(profile_type: str):
     """Get example data for 'iniciante' or 'veterano' profiles"""
@@ -477,7 +612,8 @@ async def get_example_data(profile_type: str):
     else:
         raise HTTPException(status_code=404, detail="Profile type not found. Use 'iniciante' or 'veterano'")
 
-# Include the router in the main app
+# Include routers
+app.include_router(auth_router)
 app.include_router(api_router)
 
 app.add_middleware(
