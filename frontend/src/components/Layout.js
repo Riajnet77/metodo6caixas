@@ -102,7 +102,7 @@ const Layout = () => {
             <button onClick={() => setSidebarOpen(true)}>
               <Menu className="w-6 h-6" />
             </button>
-            <h2 className="text-lg font-bold text-gray-800">Mente Milionária</h2>
+            <h2 className="text-lg font-bold text-gray-800">Hábito da Economia</h2>
             <div className="w-6" />
           </div>
         </header>
