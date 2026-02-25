@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Outlet, Link, useLocation } from 'react-router-dom';
+import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import { 
   LayoutDashboard, 
   Settings, 
@@ -8,7 +9,9 @@ import {
   BookOpen, 
   Users,
   Menu,
-  X
+  X,
+  LogOut,
+  User
 } from 'lucide-react';
 
 const Layout = () => {
