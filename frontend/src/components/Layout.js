@@ -45,8 +45,8 @@ const Layout = () => {
           <div className="p-6 border-b border-gray-200">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-xl font-bold text-gray-800 font-serif">Mente Milionária</h1>
-                <p className="text-xs text-amber-600 font-semibold">& Finanças Bíblicas</p>
+                <h1 className="text-xl font-bold text-gray-800 font-serif">O Hábito da Economia</h1>
+                <p className="text-xs text-amber-600 font-semibold">e Gestão Financeira</p>
               </div>
               <button 
                 className="lg:hidden"
