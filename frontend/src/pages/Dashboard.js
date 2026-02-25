@@ -222,9 +222,10 @@ const Dashboard = () => {
                   <p className="text-sm">Real: R$ {category.actual_amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                   <p className="text-sm">Ideal: R$ {category.ideal_amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                 </div>
-                <div className="text-right">
+                <div className="flex justify-between items-center">
                   <p className="text-sm font-medium">
-                    Desvio: {category.deviation > 0 ? '+' : ''}{category.deviation.toFixed(1)}%
+                    Variação: {category.deviation > 0 ? '+' : ''}{category.deviation.toFixed(1)}%
+                    {category.deviation > 0 ? ' acima' : category.deviation < 0 ? ' abaixo' : ' no ideal'}
                   </p>
                 </div>
               </div>
