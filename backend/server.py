@@ -293,21 +293,38 @@ async def root():
 
 # Settings Routes
 @api_router.get("/settings", response_model=UserSettings)
-async def get_settings(current_user: TokenData = Depends(get_current_user)):
-    return await get_or_create_settings(current_user.user_id, current_user.company_id)
+async def get_settings(
+    month: Optional[int] = None,
+    year: Optional[int] = None,
+    current_user: TokenData = Depends(get_current_user)
+):
+    now = datetime.now()
+    target_month = month if month is not None else now.month
+    target_year = year if year is not None else now.year
+    return await get_or_create_settings(current_user.user_id, current_user.company_id, target_month, target_year)
 
 @api_router.put("/settings", response_model=UserSettings)
 async def update_settings(
     input: UserSettingsUpdate,
+    month: Optional[int] = None,
+    year: Optional[int] = None,
     current_user: TokenData = Depends(get_current_user)
 ):
-    settings = await get_or_create_settings(current_user.user_id, current_user.company_id)
+    now = datetime.now()
+    target_month = month if month is not None else now.month
+    target_year = year if year is not None else now.year
+    
+    settings = await get_or_create_settings(current_user.user_id, current_user.company_id, target_month, target_year)
     
     if input.monthly_income is not None:
         settings.monthly_income = input.monthly_income
+    if input.extra_income is not None:
+        settings.extra_income = input.extra_income
     if input.categories is not None:
         settings.categories = input.categories
     
+    # Recalcular total_income
+    settings.total_income = settings.monthly_income + settings.extra_income
     settings.updated_at = datetime.now(timezone.utc)
     
     doc = settings.model_dump()
@@ -315,7 +332,7 @@ async def update_settings(
     doc['updated_at'] = doc['updated_at'].isoformat()
     
     await db.user_settings.update_one(
-        {"user_id": current_user.user_id, "company_id": current_user.company_id},
+        {"user_id": current_user.user_id, "company_id": current_user.company_id, "month": target_month, "year": target_year},
         {"$set": doc},
         upsert=True
     )
