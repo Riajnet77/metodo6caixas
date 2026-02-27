@@ -55,7 +55,11 @@ class UserSettings(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     user_id: str
     company_id: str
-    monthly_income: float
+    month: int  # Mês da configuração
+    year: int   # Ano da configuração
+    monthly_income: float  # Renda mensal fixa
+    extra_income: float = 0.0  # Renda extra do mês
+    total_income: float  # Renda total (calculado automaticamente)
     categories: List[Category] = Field(default_factory=lambda: [Category(**cat) for cat in DEFAULT_CATEGORIES])
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
