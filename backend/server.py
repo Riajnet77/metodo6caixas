@@ -164,10 +164,10 @@ def calculate_status(execution_percentage: float) -> str:
     else:
         return "critical"  # Vermelho - gastou mais que o ideal
 
-async def get_or_create_settings(user_id: str, company_id: str) -> UserSettings:
-    """Get existing settings or create default ones"""
+async def get_or_create_settings(user_id: str, company_id: str, month: int, year: int) -> UserSettings:
+    """Get existing settings for specific month or create default ones"""
     settings_doc = await db.user_settings.find_one(
-        {"user_id": user_id, "company_id": company_id}, 
+        {"user_id": user_id, "company_id": company_id, "month": month, "year": year}, 
         {"_id": 0}
     )
     
@@ -178,11 +178,15 @@ async def get_or_create_settings(user_id: str, company_id: str) -> UserSettings:
             settings_doc['updated_at'] = datetime.fromisoformat(settings_doc['updated_at'])
         return UserSettings(**settings_doc)
     
-    # Create default settings
+    # Create default settings for this month
     default_settings = UserSettings(
         user_id=user_id,
         company_id=company_id,
-        monthly_income=5000.0
+        month=month,
+        year=year,
+        monthly_income=5000.0,
+        extra_income=0.0,
+        total_income=5000.0
     )
     doc = default_settings.model_dump()
     doc['created_at'] = doc['created_at'].isoformat()
