@@ -238,36 +238,69 @@ const Dashboard = () => {
           {dashboardData.categories_summary.map((category, index) => (
             <div 
               key={index} 
-              className={`border rounded-lg p-4 ${getStatusColor(category.status)}`}
+              className={`border-2 rounded-lg p-4 ${getStatusColor(category.status)}`}
               data-testid={`category-${category.name.toLowerCase().replace(/\s+/g, '-')}`}
             >
-              <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                   {getStatusIcon(category.status)}
                   <h3 className="font-semibold text-lg">{category.name}</h3>
                 </div>
-                <span className="text-sm font-medium">
-                  {category.actual_percentage.toFixed(1)}% (Ideal: {category.ideal_percentage}%)
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
-                <div>
-                  <p className="text-sm">Real: R$ {category.actual_amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
-                  <p className="text-sm">Ideal: R$ {category.ideal_amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
-                </div>
-                <div className="flex justify-between items-center">
-                  <p className="text-sm font-medium">
-                    Variação: {category.deviation > 0 ? '+' : ''}{category.deviation.toFixed(1)}%
-                    {category.deviation > 0 ? ' acima' : category.deviation < 0 ? ' abaixo' : ' no ideal'}
+                <div className="text-right">
+                  <p className="text-2xl font-bold">
+                    {category.execution_percentage.toFixed(1)}%
+                  </p>
+                  <p className="text-xs font-medium">
+                    {category.execution_percentage < 100 && '🟢 Abaixo'}
+                    {category.execution_percentage === 100 && '🔵 Exato'}
+                    {category.execution_percentage > 100 && '🔴 Acima'}
                   </p>
                 </div>
               </div>
-              {/* Progress bar */}
-              <div className="mt-2 bg-white bg-opacity-50 rounded-full h-2 overflow-hidden">
+              
+              <div className="grid grid-cols-2 gap-4 mb-3">
+                <div className="bg-white bg-opacity-50 rounded p-2">
+                  <p className="text-xs text-gray-600">Ideal</p>
+                  <p className="font-semibold text-green-700">
+                    R$ {category.ideal_amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                  </p>
+                </div>
+                <div className="bg-white bg-opacity-50 rounded p-2">
+                  <p className="text-xs text-gray-600">Realizado</p>
+                  <p className="font-semibold" style={{ color: getExecutionColor(category.execution_percentage) }}>
+                    R$ {category.actual_amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                  </p>
+                </div>
+              </div>
+
+              {/* Progress bar com cor dinâmica */}
+              <div className="mt-2 bg-white bg-opacity-50 rounded-full h-3 overflow-hidden">
                 <div 
-                  className="h-full bg-current transition-all"
-                  style={{ width: `${Math.min(category.actual_percentage, 100)}%` }}
+                  className="h-full transition-all"
+                  style={{ 
+                    width: `${Math.min(category.execution_percentage, 100)}%`,
+                    backgroundColor: getExecutionColor(category.execution_percentage)
+                  }}
                 />
+              </div>
+
+              {/* Legenda explicativa */}
+              <div className="mt-2 text-xs text-center">
+                {category.execution_percentage < 100 && (
+                  <span className="text-green-700 font-medium">
+                    ✅ Economizou {(100 - category.execution_percentage).toFixed(1)}% do ideal
+                  </span>
+                )}
+                {category.execution_percentage === 100 && (
+                  <span className="text-blue-700 font-medium">
+                    ✅ Gastou exatamente o planejado
+                  </span>
+                )}
+                {category.execution_percentage > 100 && (
+                  <span className="text-red-700 font-medium">
+                    ⚠️ Ultrapassou {(category.execution_percentage - 100).toFixed(1)}% do ideal
+                  </span>
+                )}
               </div>
             </div>
           ))}
