@@ -140,6 +140,8 @@ class CategorySummary(BaseModel):
 
 class DashboardData(BaseModel):
     monthly_income: float
+    extra_income: float
+    total_income: float
     total_expenses: float
     balance: float
     categories_summary: List[CategorySummary]
