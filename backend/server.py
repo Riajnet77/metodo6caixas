@@ -558,7 +558,7 @@ async def get_dashboard(
     target_month = month if month is not None else now.month
     target_year = year if year is not None else now.year
     
-    settings = await get_or_create_settings(current_user.user_id, current_user.company_id)
+    settings = await get_or_create_settings(current_user.user_id, current_user.company_id, target_month, target_year)
     
     transactions = await db.transactions.find({
         "user_id": current_user.user_id,
@@ -577,16 +577,16 @@ async def get_dashboard(
     categories_summary = []
     for cat in settings.categories:
         actual_amount = category_totals.get(cat.name, 0.0)
-        ideal_amount = settings.monthly_income * (cat.ideal_percentage / 100)
-        actual_percentage = (actual_amount / settings.monthly_income * 100) if settings.monthly_income > 0 else 0
+        ideal_amount = settings.total_income * (cat.ideal_percentage / 100)
+        actual_percentage = (actual_amount / settings.total_income * 100) if settings.total_income > 0 else 0
         
-        # Nova fórmula: Variação % = ((Real - Ideal) / Ideal) × 100
+        # Novo cálculo: Executado % = (Real / Ideal) × 100
         if ideal_amount > 0:
-            deviation = ((actual_amount - ideal_amount) / ideal_amount) * 100
+            execution_percentage = (actual_amount / ideal_amount) * 100
         else:
-            deviation = 0.0
+            execution_percentage = 0.0
         
-        status = calculate_status(actual_percentage, cat.ideal_percentage)
+        status = calculate_status(execution_percentage)
         
         categories_summary.append(CategorySummary(
             name=cat.name,
@@ -594,14 +594,16 @@ async def get_dashboard(
             ideal_percentage=cat.ideal_percentage,
             actual_amount=actual_amount,
             actual_percentage=actual_percentage,
-            deviation=deviation,
+            execution_percentage=execution_percentage,
             status=status
         ))
     
-    balance = settings.monthly_income - total_expenses
+    balance = settings.total_income - total_expenses
     
     return DashboardData(
         monthly_income=settings.monthly_income,
+        extra_income=settings.extra_income,
+        total_income=settings.total_income,
         total_expenses=total_expenses,
         balance=balance,
         categories_summary=categories_summary,
