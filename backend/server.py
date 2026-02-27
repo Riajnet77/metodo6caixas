@@ -135,7 +135,7 @@ class CategorySummary(BaseModel):
     ideal_percentage: float
     actual_amount: float
     actual_percentage: float
-    deviation: float
+    execution_percentage: float  # Novo: (Real / Ideal) × 100
     status: str
 
 class DashboardData(BaseModel):
