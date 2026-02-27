@@ -179,11 +179,14 @@ const Dashboard = () => {
         {/* Pie Chart */}
         <div className="bg-white rounded-xl p-6 shadow-lg">
           <h2 className="text-xl font-bold text-gray-900 mb-4">Distribuição por Categoria</h2>
-          {pieData.length > 0 ? (
+          {dashboardData.categories_summary.some(cat => cat.actual_amount > 0) ? (
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
                 <Pie
-                  data={pieData}
+                  data={dashboardData.categories_summary.filter(cat => cat.actual_amount > 0).map(cat => ({
+                    name: cat.name,
+                    value: cat.actual_amount
+                  }))}
                   cx="50%"
                   cy="50%"
                   labelLine={false}
@@ -192,8 +195,8 @@ const Dashboard = () => {
                   fill="#8884d8"
                   dataKey="value"
                 >
-                  {pieData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  {dashboardData.categories_summary.filter(cat => cat.actual_amount > 0).map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS_PIE[index % COLORS_PIE.length]} />
                   ))}
                 </Pie>
                 <Tooltip formatter={(value) => `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`} />
@@ -208,7 +211,7 @@ const Dashboard = () => {
 
         {/* Bar Chart */}
         <div className="bg-white rounded-xl p-6 shadow-lg">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Ideal vs Real</h2>
+          <h2 className="text-xl font-bold text-gray-900 mb-4">Ideal vs Realizado</h2>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={barData}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -216,10 +219,15 @@ const Dashboard = () => {
               <YAxis />
               <Tooltip formatter={(value) => `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`} />
               <Legend />
-              <Bar dataKey="Ideal" fill="#D4AF37" />
-              <Bar dataKey="Real" fill="#3B82F6" />
+              <Bar dataKey="Ideal" fill={COLOR_IDEAL} name="Ideal (Verde)" />
+              <Bar dataKey="Realizado" fill={COLOR_REALIZADO} name="Realizado (Azul)" />
             </BarChart>
           </ResponsiveContainer>
+          <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+            <p className="text-xs text-gray-600 text-center">
+              🟢 <strong>Verde:</strong> Ideal | 🔵 <strong>Azul:</strong> Realizado
+            </p>
+          </div>
         </div>
       </div>
 
