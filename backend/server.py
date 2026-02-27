@@ -65,11 +65,15 @@ class UserSettings(BaseModel):
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class UserSettingsCreate(BaseModel):
+    month: int
+    year: int
     monthly_income: float
+    extra_income: float = 0.0
     categories: Optional[List[Category]] = None
 
 class UserSettingsUpdate(BaseModel):
     monthly_income: Optional[float] = None
+    extra_income: Optional[float] = None
     categories: Optional[List[Category]] = None
 
 class Transaction(BaseModel):
