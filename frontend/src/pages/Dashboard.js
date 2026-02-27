@@ -41,9 +41,9 @@ const Dashboard = () => {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'ok': return 'text-green-600 bg-green-50 border-green-200';
-      case 'warning': return 'text-yellow-600 bg-yellow-50 border-yellow-200';
-      case 'critical': return 'text-red-600 bg-red-50 border-red-200';
+      case 'ok': return 'text-green-700 bg-green-100 border-green-300'; // < 100% - Verde forte
+      case 'perfect': return 'text-blue-700 bg-blue-100 border-blue-300'; // = 100% - Azul
+      case 'critical': return 'text-red-700 bg-red-100 border-red-300'; // > 100% - Vermelho
       default: return 'text-gray-600 bg-gray-50 border-gray-200';
     }
   };
@@ -51,10 +51,16 @@ const Dashboard = () => {
   const getStatusIcon = (status) => {
     switch (status) {
       case 'ok': return <TrendingUp className="w-5 h-5" />;
-      case 'warning': return <AlertCircle className="w-5 h-5" />;
+      case 'perfect': return <DollarSign className="w-5 h-5" />;
       case 'critical': return <TrendingDown className="w-5 h-5" />;
       default: return null;
     }
+  };
+
+  const getExecutionColor = (execution) => {
+    if (execution < 100) return '#10B981'; // Verde forte
+    if (execution === 100) return '#3B82F6'; // Azul
+    return '#EF4444'; // Vermelho
   };
 
   // Prepare data for pie chart
