@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Save, RefreshCw } from 'lucide-react';
+import { Save, RefreshCw, Calendar } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -10,15 +10,17 @@ const Configuracoes = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 
   useEffect(() => {
     fetchSettings();
-  }, []);
+  }, [selectedMonth, selectedYear]);
 
   const fetchSettings = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API}/settings`);
+      const response = await axios.get(`${API}/settings?month=${selectedMonth}&year=${selectedYear}`);
       setSettings(response.data);
     } catch (error) {
       console.error('Erro ao buscar configurações:', error);
@@ -30,12 +32,14 @@ const Configuracoes = () => {
   const handleSave = async () => {
     try {
       setSaving(true);
-      await axios.put(`${API}/settings`, {
+      await axios.put(`${API}/settings?month=${selectedMonth}&year=${selectedYear}`, {
         monthly_income: settings.monthly_income,
+        extra_income: settings.extra_income,
         categories: settings.categories
       });
       setMessage('✅ Configurações salvas com sucesso!');
       setTimeout(() => setMessage(''), 3000);
+      fetchSettings(); // Recarregar para pegar total_income atualizado
     } catch (error) {
       console.error('Erro ao salvar configurações:', error);
       setMessage('❌ Erro ao salvar configurações');
@@ -51,6 +55,11 @@ const Configuracoes = () => {
   };
 
   const totalPercentage = settings?.categories.reduce((sum, cat) => sum + cat.ideal_percentage, 0) || 0;
+
+  const months = [
+    'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+    'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+  ];
 
   if (loading) {
     return (
@@ -68,7 +77,37 @@ const Configuracoes = () => {
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-2 font-serif">Configurações Financeiras</h1>
-        <p className="text-gray-600">Defina sua renda e os percentuais ideais para cada categoria</p>
+        <p className="text-gray-600">Defina sua renda mensal e extra para cada mês</p>
+      </div>
+
+      {/* Month/Year Selector */}
+      <div className="bg-white rounded-xl p-6 shadow-lg mb-6">
+        <div className="flex items-center gap-2 mb-4">
+          <Calendar className="w-5 h-5 text-amber-600" />
+          <h2 className="text-xl font-bold text-gray-900">Selecione o Mês</h2>
+        </div>
+        <div className="flex gap-4">
+          <select
+            value={selectedMonth}
+            onChange={(e) => setSelectedMonth(Number(e.target.value))}
+            className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+            data-testid="month-selector"
+          >
+            {months.map((month, index) => (
+              <option key={index} value={index + 1}>{month}</option>
+            ))}
+          </select>
+          <select
+            value={selectedYear}
+            onChange={(e) => setSelectedYear(Number(e.target.value))}
+            className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+            data-testid="year-selector"
+          >
+            {[2024, 2025, 2026].map(year => (
+              <option key={year} value={year}>{year}</option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {/* Message */}
@@ -80,24 +119,74 @@ const Configuracoes = () => {
         </div>
       )}
 
-      {/* Income Section */}
+      {/* Income Section - 3 campos */}
       <div className="bg-white rounded-xl p-6 shadow-lg mb-6">
-        <h2 className="text-xl font-bold text-gray-900 mb-4">Renda Mensal</h2>
-        <div className="flex items-center gap-4">
-          <span className="text-gray-700 font-medium">R$</span>
-          <input
-            type="number"
-            value={settings?.monthly_income || 0}
-            onChange={(e) => setSettings({ ...settings, monthly_income: parseFloat(e.target.value) || 0 })}
-            className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-lg"
-            placeholder="5000.00"
-            step="0.01"
-            data-testid="monthly-income-input"
-          />
+        <h2 className="text-xl font-bold text-gray-900 mb-4">Configuração de Renda</h2>
+        
+        <div className="space-y-4">
+          {/* Renda Mensal */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Renda Mensal (Fixa)
+            </label>
+            <div className="flex items-center gap-4">
+              <span className="text-gray-700 font-medium">R$</span>
+              <input
+                type="number"
+                value={settings?.monthly_income || 0}
+                onChange={(e) => setSettings({ 
+                  ...settings, 
+                  monthly_income: parseFloat(e.target.value) || 0 
+                })}
+                className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-lg"
+                placeholder="5000.00"
+                step="0.01"
+                data-testid="monthly-income-input"
+              />
+            </div>
+            <p className="text-sm text-gray-500 mt-1">
+              💡 Salário fixo mensal
+            </p>
+          </div>
+
+          {/* Renda Extra */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Renda Extra (Variável)
+            </label>
+            <div className="flex items-center gap-4">
+              <span className="text-gray-700 font-medium">R$</span>
+              <input
+                type="number"
+                value={settings?.extra_income || 0}
+                onChange={(e) => setSettings({ 
+                  ...settings, 
+                  extra_income: parseFloat(e.target.value) || 0 
+                })}
+                className="flex-1 px-4 py-3 border border-amber-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-lg bg-amber-50"
+                placeholder="0.00"
+                step="0.01"
+                data-testid="extra-income-input"
+              />
+            </div>
+            <p className="text-sm text-gray-500 mt-1">
+              💰 Freelance, bônus, comissões (pode alterar a qualquer momento)
+            </p>
+          </div>
+
+          {/* Renda Total (Calculado) */}
+          <div className="pt-4 border-t border-gray-200">
+            <div className="flex justify-between items-center p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border-2 border-green-200">
+              <span className="text-lg font-bold text-gray-900">Renda Total</span>
+              <span className="text-2xl font-bold text-green-700">
+                R$ {((settings?.monthly_income || 0) + (settings?.extra_income || 0)).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+              </span>
+            </div>
+            <p className="text-sm text-gray-500 mt-2 text-center">
+              ✅ Este valor será usado para calcular os percentuais ideais
+            </p>
+          </div>
         </div>
-        <p className="text-sm text-gray-500 mt-2">
-          💡 Dica: Inclua todas as suas fontes de renda (salário, freelance, investimentos, etc.)
-        </p>
       </div>
 
       {/* Categories Section */}
@@ -113,7 +202,8 @@ const Configuracoes = () => {
 
         <div className="space-y-4">
           {settings?.categories.map((category, index) => {
-            const idealAmount = (settings.monthly_income * category.ideal_percentage) / 100;
+            const totalIncome = (settings.monthly_income || 0) + (settings.extra_income || 0);
+            const idealAmount = (totalIncome * category.ideal_percentage) / 100;
             return (
               <div key={index} className="border border-gray-200 rounded-lg p-4">
                 <div className="grid md:grid-cols-3 gap-4">
