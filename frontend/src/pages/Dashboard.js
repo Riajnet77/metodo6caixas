@@ -63,20 +63,16 @@ const Dashboard = () => {
     return '#EF4444'; // Vermelho
   };
 
-  // Prepare data for pie chart
-  const pieData = dashboardData.categories_summary.map(cat => ({
-    name: cat.name,
-    value: cat.actual_amount
-  })).filter(item => item.value > 0);
-
-  const COLORS = ['#3B82F6', '#10B981', '#8B5CF6', '#F59E0B', '#EF4444', '#06B6D4'];
-
-  // Prepare data for bar chart
+  // Prepare data for bar chart com cores dinâmicas
   const barData = dashboardData.categories_summary.map(cat => ({
     name: cat.name,
     Ideal: cat.ideal_amount,
-    Real: cat.actual_amount
+    Realizado: cat.actual_amount
   }));
+
+  const COLORS_PIE = ['#3B82F6', '#10B981', '#8B5CF6', '#F59E0B', '#EF4444', '#06B6D4'];
+  const COLOR_IDEAL = '#10B981'; // Verde forte para Ideal
+  const COLOR_REALIZADO = '#3B82F6'; // Azul padrão para Realizado
 
   const months = [
     'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
