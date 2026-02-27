@@ -150,14 +150,19 @@ class DashboardData(BaseModel):
 
 # ==================== HELPER FUNCTIONS ====================
 
-def calculate_status(actual_percentage: float, ideal_percentage: float) -> str:
-    """Calculate status based on deviation from ideal"""
-    if actual_percentage <= ideal_percentage * 0.9:
-        return "ok"
-    elif actual_percentage <= ideal_percentage:
-        return "warning"
+def calculate_status(execution_percentage: float) -> str:
+    """
+    Calculate status based on execution percentage
+    < 100%: ok (gastou menos - BOM)
+    = 100%: warning (gastou exatamente - OK)
+    > 100%: critical (gastou mais - RUIM)
+    """
+    if execution_percentage < 100:
+        return "ok"  # Verde - gastou menos que o ideal
+    elif execution_percentage == 100:
+        return "perfect"  # Azul - gastou exatamente o ideal
     else:
-        return "critical"
+        return "critical"  # Vermelho - gastou mais que o ideal
 
 async def get_or_create_settings(user_id: str, company_id: str) -> UserSettings:
     """Get existing settings or create default ones"""
