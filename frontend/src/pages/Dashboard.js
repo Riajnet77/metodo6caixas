@@ -116,14 +116,34 @@ const Dashboard = () => {
       </div>
 
       {/* KPI Cards */}
-      <div className="grid md:grid-cols-3 gap-6 mb-8">
-        <div className="bg-white rounded-xl p-6 shadow-lg" data-testid="kpi-income">
+      <div className="grid md:grid-cols-4 gap-6 mb-8">
+        <div className="bg-white rounded-xl p-6 shadow-lg" data-testid="kpi-monthly-income">
           <div className="flex items-center justify-between mb-2">
             <p className="text-gray-600 text-sm font-medium">Renda Mensal</p>
             <DollarSign className="w-5 h-5 text-blue-500" />
           </div>
-          <p className="text-3xl font-bold text-gray-900">
+          <p className="text-2xl font-bold text-gray-900">
             R$ {dashboardData.monthly_income.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+          </p>
+        </div>
+
+        <div className="bg-white rounded-xl p-6 shadow-lg" data-testid="kpi-extra-income">
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-gray-600 text-sm font-medium">Renda Extra</p>
+            <TrendingUp className="w-5 h-5 text-amber-500" />
+          </div>
+          <p className="text-2xl font-bold text-amber-600">
+            R$ {dashboardData.extra_income.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+          </p>
+        </div>
+
+        <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 shadow-lg" data-testid="kpi-total-income">
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-gray-700 text-sm font-medium">Renda Total</p>
+            <DollarSign className="w-5 h-5 text-green-600" />
+          </div>
+          <p className="text-2xl font-bold text-green-700">
+            R$ {dashboardData.total_income.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
           </p>
         </div>
 
@@ -132,26 +152,29 @@ const Dashboard = () => {
             <p className="text-gray-600 text-sm font-medium">Gastos Totais</p>
             <TrendingDown className="w-5 h-5 text-red-500" />
           </div>
-          <p className="text-3xl font-bold text-gray-900">
+          <p className="text-2xl font-bold text-gray-900">
             R$ {dashboardData.total_expenses.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
           </p>
         </div>
+      </div>
 
-        <div className={`rounded-xl p-6 shadow-lg ${
-          dashboardData.balance >= 0 ? 'bg-gradient-to-br from-green-50 to-green-100' : 'bg-gradient-to-br from-red-50 to-red-100'
-        }`} data-testid="kpi-balance">
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-gray-600 text-sm font-medium">Saldo</p>
-            {dashboardData.balance >= 0 ? 
-              <TrendingUp className="w-5 h-5 text-green-600" /> : 
-              <TrendingDown className="w-5 h-5 text-red-600" />
-            }
+      {/* Balance Card */}
+      <div className={`rounded-xl p-6 shadow-lg mb-8 ${
+        dashboardData.balance >= 0 ? 'bg-gradient-to-br from-green-50 to-green-100' : 'bg-gradient-to-br from-red-50 to-red-100'
+      }`} data-testid="kpi-balance">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-gray-600 text-sm font-medium mb-2">Saldo do Mês</p>
+            <p className={`text-4xl font-bold ${
+              dashboardData.balance >= 0 ? 'text-green-700' : 'text-red-700'
+            }`}>
+              R$ {Math.abs(dashboardData.balance).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+            </p>
           </div>
-          <p className={`text-3xl font-bold ${
-            dashboardData.balance >= 0 ? 'text-green-700' : 'text-red-700'
-          }`}>
-            R$ {Math.abs(dashboardData.balance).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-          </p>
+          {dashboardData.balance >= 0 ? 
+            <TrendingUp className="w-12 h-12 text-green-600" /> : 
+            <TrendingDown className="w-12 h-12 text-red-600" />
+          }
         </div>
       </div>
 
