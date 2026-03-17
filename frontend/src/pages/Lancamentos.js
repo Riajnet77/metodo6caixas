@@ -18,14 +18,28 @@ const Lancamentos = () => {
     amount: '',
     notes: ''
   });
-  const [filterMonth, setFilterMonth] = useState(new Date().getMonth() + 1);
-  const [filterYear, setFilterYear] = useState(new Date().getFullYear());
+  
+  // Recuperar último mês usado do localStorage ou usar mês atual
+  const [filterMonth, setFilterMonth] = useState(() => {
+    const saved = localStorage.getItem('lastUsedMonth');
+    return saved ? Number(saved) : new Date().getMonth() + 1;
+  });
+  const [filterYear, setFilterYear] = useState(() => {
+    const saved = localStorage.getItem('lastUsedYear');
+    return saved ? Number(saved) : new Date().getFullYear();
+  });
   const [filterCategory, setFilterCategory] = useState('');
 
   useEffect(() => {
     fetchSettings();
     fetchTransactions();
   }, [filterMonth, filterYear, filterCategory]);
+
+  // Salvar último mês/ano usado quando mudar manualmente
+  useEffect(() => {
+    localStorage.setItem('lastUsedMonth', filterMonth.toString());
+    localStorage.setItem('lastUsedYear', filterYear.toString());
+  }, [filterMonth, filterYear]);
 
   const fetchSettings = async () => {
     try {
@@ -69,6 +83,18 @@ const Lancamentos = () => {
       } else {
         await axios.post(`${API}/transactions`, dataToSend);
       }
+
+      // Salvar último mês/ano usado após lançamento bem-sucedido
+      const transactionDate = new Date(formData.date);
+      const transactionMonth = transactionDate.getMonth() + 1;
+      const transactionYear = transactionDate.getFullYear();
+      
+      localStorage.setItem('lastUsedMonth', transactionMonth.toString());
+      localStorage.setItem('lastUsedYear', transactionYear.toString());
+      
+      // Atualizar filtros para o mês do lançamento
+      setFilterMonth(transactionMonth);
+      setFilterYear(transactionYear);
 
       resetForm();
       fetchTransactions();
@@ -124,19 +150,72 @@ const Lancamentos = () => {
   return (
     <div className="max-w-6xl mx-auto" data-testid="lancamentos-page">
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2 font-serif">Lançamentos</h1>
-          <p className="text-gray-600">Registre suas despesas e acompanhe seus gastos</p>
+      <div className="mb-8">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2 font-serif">Lançamentos</h1>
+            <p className="text-gray-600">Registre suas despesas e acompanhe seus gastos</p>
+          </div>
         </div>
-        <button
-          onClick={() => setShowForm(!showForm)}
-          className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-500 to-yellow-500 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-          data-testid="add-transaction-button"
-        >
-          {showForm ? <X className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
-          {showForm ? 'Cancelar' : 'Nova Despesa'}
-        </button>
+
+        {/* Filtros e Botão Nova Despesa na mesma linha */}
+        <div className="bg-white rounded-xl p-6 shadow-lg">
+          <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-end">
+            {/* Filtros */}
+            <div className="flex-1 grid md:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Mês</label>
+                <select
+                  value={filterMonth}
+                  onChange={(e) => setFilterMonth(Number(e.target.value))}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                  data-testid="filter-month"
+                >
+                  {months.map((month, index) => (
+                    <option key={index} value={index + 1}>{month}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Ano</label>
+                <select
+                  value={filterYear}
+                  onChange={(e) => setFilterYear(Number(e.target.value))}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                  data-testid="filter-year"
+                >
+                  {[2024, 2025, 2026].map(year => (
+                    <option key={year} value={year}>{year}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Categoria</label>
+                <select
+                  value={filterCategory}
+                  onChange={(e) => setFilterCategory(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                  data-testid="filter-category"
+                >
+                  <option value="">Todas</option>
+                  {categories.map((cat, idx) => (
+                    <option key={idx} value={cat.name}>{cat.name}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Botão Nova Despesa */}
+            <button
+              onClick={() => setShowForm(!showForm)}
+              className="w-full lg:w-auto whitespace-nowrap flex items-center justify-center gap-2 px-6 py-2.5 bg-gradient-to-r from-amber-500 to-yellow-500 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+              data-testid="add-transaction-button"
+            >
+              {showForm ? <X className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
+              {showForm ? 'Cancelar' : 'Nova Despesa'}
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Form */}
@@ -235,53 +314,6 @@ const Lancamentos = () => {
           </form>
         </div>
       )}
-
-      {/* Filters */}
-      <div className="bg-white rounded-xl p-6 shadow-lg mb-6">
-        <h2 className="text-lg font-bold text-gray-900 mb-4">Filtros</h2>
-        <div className="grid md:grid-cols-3 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Mês</label>
-            <select
-              value={filterMonth}
-              onChange={(e) => setFilterMonth(Number(e.target.value))}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-              data-testid="filter-month"
-            >
-              {months.map((month, index) => (
-                <option key={index} value={index + 1}>{month}</option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Ano</label>
-            <select
-              value={filterYear}
-              onChange={(e) => setFilterYear(Number(e.target.value))}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-              data-testid="filter-year"
-            >
-              {[2024, 2025, 2026].map(year => (
-                <option key={year} value={year}>{year}</option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Categoria</label>
-            <select
-              value={filterCategory}
-              onChange={(e) => setFilterCategory(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-              data-testid="filter-category"
-            >
-              <option value="">Todas</option>
-              {categories.map((cat, idx) => (
-                <option key={idx} value={cat.name}>{cat.name}</option>
-              ))}
-            </select>
-          </div>
-        </div>
-      </div>
 
       {/* Summary */}
       <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 mb-6 border border-blue-100">

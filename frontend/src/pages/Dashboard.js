@@ -63,16 +63,16 @@ const Dashboard = () => {
     return '#EF4444'; // Vermelho
   };
 
-  // Prepare data for bar chart com cores dinâmicas
+  // Prepare data for bar chart com cores dinâmicas por categoria
   const barData = dashboardData.categories_summary.map(cat => ({
     name: cat.name,
     Ideal: cat.ideal_amount,
-    Realizado: cat.actual_amount
+    Realizado: cat.actual_amount,
+    color: getExecutionColor(cat.execution_percentage) // Cor dinâmica
   }));
 
   const COLORS_PIE = ['#3B82F6', '#10B981', '#8B5CF6', '#F59E0B', '#EF4444', '#06B6D4'];
   const COLOR_IDEAL = '#10B981'; // Verde forte para Ideal
-  const COLOR_REALIZADO = '#3B82F6'; // Azul padrão para Realizado
 
   const months = [
     'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
@@ -174,9 +174,37 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Charts */}
+      {/* Charts - INVERTIDOS: Barras à esquerda, Pizza à direita */}
       <div className="grid lg:grid-cols-2 gap-8 mb-8">
-        {/* Pie Chart */}
+        {/* Bar Chart - AGORA À ESQUERDA */}
+        <div className="bg-white rounded-xl p-6 shadow-lg">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">Ideal vs Realizado</h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={barData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" angle={-45} textAnchor="end" height={100} fontSize={11} />
+              <YAxis />
+              <Tooltip formatter={(value) => `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`} />
+              <Legend />
+              {/* Barra Ideal - Verde forte */}
+              <Bar dataKey="Ideal" fill={COLOR_IDEAL} name="Ideal" />
+              {/* Barra Realizado - Cor dinâmica por categoria */}
+              <Bar dataKey="Realizado" name="Realizado">
+                {barData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+          <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+            <p className="text-xs text-gray-700 text-center font-medium">
+              🟢 <strong>Ideal (Verde)</strong> | 
+              <strong> Realizado:</strong> 🟢 Verde (&lt;100%) | 🔵 Azul (=100%) | 🔴 Vermelho (&gt;100%)
+            </p>
+          </div>
+        </div>
+
+        {/* Pie Chart - AGORA À DIREITA */}
         <div className="bg-white rounded-xl p-6 shadow-lg">
           <h2 className="text-xl font-bold text-gray-900 mb-4">Distribuição por Categoria</h2>
           {dashboardData.categories_summary.some(cat => cat.actual_amount > 0) ? (
@@ -207,27 +235,6 @@ const Dashboard = () => {
               <p>Nenhum gasto registrado este mês</p>
             </div>
           )}
-        </div>
-
-        {/* Bar Chart */}
-        <div className="bg-white rounded-xl p-6 shadow-lg">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Ideal vs Realizado</h2>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={barData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" angle={-45} textAnchor="end" height={100} />
-              <YAxis />
-              <Tooltip formatter={(value) => `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`} />
-              <Legend />
-              <Bar dataKey="Ideal" fill={COLOR_IDEAL} name="Ideal (Verde)" />
-              <Bar dataKey="Realizado" fill={COLOR_REALIZADO} name="Realizado (Azul)" />
-            </BarChart>
-          </ResponsiveContainer>
-          <div className="mt-4 p-3 bg-gray-50 rounded-lg">
-            <p className="text-xs text-gray-600 text-center">
-              🟢 <strong>Verde:</strong> Ideal | 🔵 <strong>Azul:</strong> Realizado
-            </p>
-          </div>
         </div>
       </div>
 
@@ -285,22 +292,8 @@ const Dashboard = () => {
               </div>
 
               {/* Legenda explicativa */}
-              <div className="mt-2 text-xs text-center">
-                {category.execution_percentage < 100 && (
-                  <span className="text-green-700 font-medium">
-                    ✅ Economizou {(100 - category.execution_percentage).toFixed(1)}% do ideal
-                  </span>
-                )}
-                {category.execution_percentage === 100 && (
-                  <span className="text-blue-700 font-medium">
-                    ✅ Gastou exatamente o planejado
-                  </span>
-                )}
-                {category.execution_percentage > 100 && (
-                  <span className="text-red-700 font-medium">
-                    ⚠️ Ultrapassou {(category.execution_percentage - 100).toFixed(1)}% do ideal
-                  </span>
-                )}
+              <div className="mt-2 text-xs text-center font-semibold">
+                Realizado: {category.execution_percentage.toFixed(1)}% do ideal
               </div>
             </div>
           ))}
