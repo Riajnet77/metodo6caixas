@@ -257,11 +257,6 @@ const Dashboard = () => {
                   <p className="text-2xl font-bold">
                     {category.execution_percentage.toFixed(1)}%
                   </p>
-                  <p className="text-xs font-medium">
-                    {category.execution_percentage < 100 && '🟢 Abaixo'}
-                    {category.execution_percentage === 100 && '🔵 Exato'}
-                    {category.execution_percentage > 100 && '🔴 Acima'}
-                  </p>
                 </div>
               </div>
               
