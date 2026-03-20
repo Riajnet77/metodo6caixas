@@ -1,0 +1,19 @@
+# Vercel
+.vercel
+
+# Environment variables
+.env.local
+.env.production.local
+
+# Build
+build/
+dist/
+
+# Dependencies
+node_modules/
+__pycache__/
+*.pyc
+
+# OS
+.DS_Store
+Thumbs.db
