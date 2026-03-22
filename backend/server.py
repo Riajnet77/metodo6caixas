@@ -217,7 +217,7 @@ async def register(user_data: UserCreate):
         full_name=user_data.full_name,
         company_id=company_id,
         company_name=user_data.company_name,
-        hashed_password=get_password_hash(user_data.password[:72])
+        hashed_password=get_password_hash(user_data.password[:72]),
         is_active=True,
         created_at=datetime.now(timezone.utc)
     )
