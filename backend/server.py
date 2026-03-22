@@ -13,7 +13,7 @@ from datetime import datetime, timezone, timedelta
 from collections import defaultdict
 
 # Import authentication functions
-from auth import (
+from backend.auth import (
     Token, TokenData, User, UserInDB, UserCreate, UserLogin,
     verify_password, get_password_hash, create_access_token, get_current_user
 )
