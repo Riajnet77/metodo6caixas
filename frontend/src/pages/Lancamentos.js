@@ -113,7 +113,9 @@ const Lancamentos = () => {
 
     localStorage.setItem('lastMonth', currentMonth.toString());
     localStorage.setItem('lastYear', currentYear.toString());
-
+    setFilterMonth(currentMonth);
+    setFilterYear(currentYear);
+    
     setFormData({
       date: getInitialDate(currentMonth, currentYear),
       description: '',
