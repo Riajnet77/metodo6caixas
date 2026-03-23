@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
-import { UserPlus, Mail, Lock, User, Building, AlertCircle } from 'lucide-react';
+import { UserPlus, Mail, Lock, User, AlertCircle } from 'lucide-react';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -9,7 +9,6 @@ const Register = () => {
     password: '',
     confirmPassword: '',
     full_name: '',
-    company_name: ''
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -43,7 +42,7 @@ const Register = () => {
       formData.email,
       formData.password,
       formData.full_name,
-      formData.company_name
+      formData.full_name // usa o nome como company_name
     );
     
     if (result.success) {
@@ -57,13 +56,11 @@ const Register = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-amber-50 flex items-center justify-center p-4">
       <div className="max-w-md w-full">
-        {/* Logo/Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2 font-serif">O Hábito da Economia</h1>
           <p className="text-gray-600">e Gestão Financeira</p>
         </div>
 
-        {/* Register Card */}
         <div className="bg-white rounded-xl shadow-lg p-8">
           <div className="flex items-center gap-2 mb-6">
             <UserPlus className="w-6 h-6 text-amber-600" />
@@ -112,25 +109,6 @@ const Register = () => {
                   placeholder="seu@email.com"
                   required
                   data-testid="register-email-input"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Nome da Empresa
-              </label>
-              <div className="relative">
-                <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  type="text"
-                  name="company_name"
-                  value={formData.company_name}
-                  onChange={handleChange}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                  placeholder="Minha Empresa Ltda"
-                  required
-                  data-testid="register-company-input"
                 />
               </div>
             </div>
@@ -195,7 +173,6 @@ const Register = () => {
           </div>
         </div>
 
-        {/* Quote */}
         <div className="mt-8 text-center">
           <p className="text-sm text-gray-600 italic">
             "Todo resultado que você deseja na sua vida<br />está naquilo que você ainda não aprendeu"
