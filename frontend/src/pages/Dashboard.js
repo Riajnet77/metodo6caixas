@@ -9,8 +9,12 @@ const API = `${BACKEND_URL}/api`;
 const Dashboard = () => {
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [selectedMonth, setSelectedMonth] = useState(() => {
+  return Number(localStorage.getItem('lastMonth')) || new Date().getMonth() + 1;
+});
+const [selectedYear, setSelectedYear] = useState(() => {
+  return Number(localStorage.getItem('lastYear')) || new Date().getFullYear();
+});
 
   useEffect(() => {
     fetchDashboardData();
@@ -91,7 +95,7 @@ const Dashboard = () => {
       <div className="flex gap-4 mb-6">
         <select
           value={selectedMonth}
-          onChange={(e) => setSelectedMonth(Number(e.target.value))}
+          onChange={(e) => { const v = Number(e.target.value); setSelectedMonth(v); localStorage.setItem('lastMonth', v); }}
           className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
           data-testid="month-selector"
         >
@@ -101,7 +105,7 @@ const Dashboard = () => {
         </select>
         <select
           value={selectedYear}
-          onChange={(e) => setSelectedYear(Number(e.target.value))}
+          onChange={(e) => { const v = Number(e.target.value); setSelectedYear(v); localStorage.setItem('lastYear', v); }}
           className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
           data-testid="year-selector"
         >
