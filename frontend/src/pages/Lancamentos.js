@@ -93,11 +93,8 @@ const Lancamentos = () => {
       setLoading(false);
     }
   };
-
- const handleSubmit = async (e) => {
+const handleSubmit = async (e) => {
   e.preventDefault();
-  const currentMonth = filterMonth;
-  const currentYear = filterYear;
   try {
     const dataToSend = {
       ...formData,
@@ -111,26 +108,22 @@ const Lancamentos = () => {
       await axios.post(`${API}/transactions`, dataToSend);
     }
 
-    localStorage.setItem('lastMonth', currentMonth.toString());
-    localStorage.setItem('lastYear', currentYear.toString());
-    setFilterMonth(currentMonth);
-    setFilterYear(currentYear);
-    
+    setEditingId(null);
+    setShowForm(false);
     setFormData({
-      date: getInitialDate(currentMonth, currentYear),
+      date: getInitialDate(filterMonth, filterYear),
       description: '',
       category: categories[0]?.name || '',
       amount: '',
       notes: ''
     });
-    setEditingId(null);
-    setShowForm(false);
     fetchTransactions();
   } catch (error) {
     console.error('Erro ao salvar transação:', error);
     alert('Erro ao salvar transação');
   }
 };
+ 
 
   const handleEdit = (transaction) => {
     setFormData({
