@@ -94,31 +94,41 @@ const Lancamentos = () => {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const dataToSend = {
-        ...formData,
-        date: new Date(formData.date + 'T12:00:00').toISOString(),
-        amount: parseFloat(formData.amount)
-      };
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+  const currentMonth = filterMonth;
+  const currentYear = filterYear;
+  try {
+    const dataToSend = {
+      ...formData,
+      date: new Date(formData.date + 'T12:00:00').toISOString(),
+      amount: parseFloat(formData.amount)
+    };
 
-      if (editingId) {
-        await axios.put(`${API}/transactions/${editingId}`, dataToSend);
-      } else {
-        await axios.post(`${API}/transactions`, dataToSend);
-      }
-
-      localStorage.setItem('lastMonth', filterMonth.toString());
-      localStorage.setItem('lastYear', filterYear.toString());
-
-      resetForm();
-      fetchTransactions();
-    } catch (error) {
-      console.error('Erro ao salvar transação:', error);
-      alert('Erro ao salvar transação');
+    if (editingId) {
+      await axios.put(`${API}/transactions/${editingId}`, dataToSend);
+    } else {
+      await axios.post(`${API}/transactions`, dataToSend);
     }
-  };
+
+    localStorage.setItem('lastMonth', currentMonth.toString());
+    localStorage.setItem('lastYear', currentYear.toString());
+
+    setFormData({
+      date: getInitialDate(currentMonth, currentYear),
+      description: '',
+      category: categories[0]?.name || '',
+      amount: '',
+      notes: ''
+    });
+    setEditingId(null);
+    setShowForm(false);
+    fetchTransactions();
+  } catch (error) {
+    console.error('Erro ao salvar transação:', error);
+    alert('Erro ao salvar transação');
+  }
+};
 
   const handleEdit = (transaction) => {
     setFormData({
