@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { Plus, Edit2, Trash2, Save, X } from 'lucide-react';
 
@@ -11,6 +11,7 @@ const Lancamentos = () => {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
+  const [filterCategory, setFilterCategory] = useState('');
 
   const [filterMonth, setFilterMonth] = useState(() => {
     return Number(localStorage.getItem('lastMonth')) || new Date().getMonth() + 1;
@@ -18,7 +19,17 @@ const Lancamentos = () => {
   const [filterYear, setFilterYear] = useState(() => {
     return Number(localStorage.getItem('lastYear')) || new Date().getFullYear();
   });
-  const [filterCategory, setFilterCategory] = useState('');
+
+  // Ref para evitar que fetchSettings sobrescreva o mês/ano
+  const filterMonthRef = useRef(filterMonth);
+  const filterYearRef = useRef(filterYear);
+
+  useEffect(() => {
+    filterMonthRef.current = filterMonth;
+    filterYearRef.current = filterYear;
+    localStorage.setItem('lastMonth', filterMonth.toString());
+    localStorage.setItem('lastYear', filterYear.toString());
+  }, [filterMonth, filterYear]);
 
   const getInitialDate = (month, year) => {
     const today = new Date();
@@ -37,41 +48,24 @@ const Lancamentos = () => {
   });
 
   useEffect(() => {
-    fetchSettings();
+    fetchCategories();
+  }, []);
+
+  useEffect(() => {
     fetchTransactions();
   }, [filterMonth, filterYear, filterCategory]);
 
-  useEffect(() => {
-    localStorage.setItem('lastMonth', filterMonth.toString());
-    localStorage.setItem('lastYear', filterYear.toString());
-  }, [filterMonth, filterYear]);
-
-  const handleFilterMonthChange = (month) => {
-    setFilterMonth(month);
-    if (!editingId) {
-      setFormData(prev => ({
-        ...prev,
-        date: getInitialDate(month, filterYear)
-      }));
-    }
-  };
-
-  const handleFilterYearChange = (year) => {
-    setFilterYear(year);
-    if (!editingId) {
-      setFormData(prev => ({
-        ...prev,
-        date: getInitialDate(filterMonth, year)
-      }));
-    }
-  };
-
-  const fetchSettings = async () => {
+  const fetchCategories = async () => {
     try {
       const response = await axios.get(`${API}/settings`);
-      setCategories(response.data.categories);
-      if (response.data.categories.length > 0 && !formData.category) {
-        setFormData(prev => ({ ...prev, category: response.data.categories[0].name }));
+      const cats = response.data.categories;
+      setCategories(cats);
+      // Só seta categoria, não mexe na data
+      if (cats.length > 0) {
+        setFormData(prev => ({
+          ...prev,
+          category: prev.category || cats[0].name
+        }));
       }
     } catch (error) {
       console.error('Erro ao buscar categorias:', error);
@@ -82,9 +76,7 @@ const Lancamentos = () => {
     try {
       setLoading(true);
       let url = `${API}/transactions?month=${filterMonth}&year=${filterYear}`;
-      if (filterCategory) {
-        url += `&category=${filterCategory}`;
-      }
+      if (filterCategory) url += `&category=${filterCategory}`;
       const response = await axios.get(url);
       setTransactions(response.data);
     } catch (error) {
@@ -93,37 +85,55 @@ const Lancamentos = () => {
       setLoading(false);
     }
   };
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  try {
-    const dataToSend = {
-      ...formData,
-      date: new Date(formData.date + 'T12:00:00').toISOString(),
-      amount: parseFloat(formData.amount)
-    };
 
-    if (editingId) {
-      await axios.put(`${API}/transactions/${editingId}`, dataToSend);
-    } else {
-      await axios.post(`${API}/transactions`, dataToSend);
+  const handleFilterMonthChange = (month) => {
+    setFilterMonth(month);
+    if (!editingId) {
+      setFormData(prev => ({ ...prev, date: getInitialDate(month, filterYearRef.current) }));
     }
+  };
 
-    setEditingId(null);
-    setShowForm(false);
-    setFormData({
-      date: getInitialDate(filterMonth, filterYear),
-      description: '',
-      category: categories[0]?.name || '',
-      amount: '',
-      notes: ''
-    });
-    fetchTransactions();
-  } catch (error) {
-    console.error('Erro ao salvar transação:', error);
-    alert('Erro ao salvar transação');
-  }
-};
- 
+  const handleFilterYearChange = (year) => {
+    setFilterYear(year);
+    if (!editingId) {
+      setFormData(prev => ({ ...prev, date: getInitialDate(filterMonthRef.current, year) }));
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const savedMonth = filterMonthRef.current;
+    const savedYear = filterYearRef.current;
+    try {
+      const dataToSend = {
+        ...formData,
+        date: new Date(formData.date + 'T12:00:00').toISOString(),
+        amount: parseFloat(formData.amount)
+      };
+
+      if (editingId) {
+        await axios.put(`${API}/transactions/${editingId}`, dataToSend);
+      } else {
+        await axios.post(`${API}/transactions`, dataToSend);
+      }
+
+      setEditingId(null);
+      setShowForm(false);
+      setFormData({
+        date: getInitialDate(savedMonth, savedYear),
+        description: '',
+        category: categories[0]?.name || '',
+        amount: '',
+        notes: ''
+      });
+      setFilterMonth(savedMonth);
+      setFilterYear(savedYear);
+      fetchTransactions();
+    } catch (error) {
+      console.error('Erro ao salvar transação:', error);
+      alert('Erro ao salvar transação');
+    }
+  };
 
   const handleEdit = (transaction) => {
     setFormData({
@@ -150,7 +160,7 @@ const handleSubmit = async (e) => {
 
   const resetForm = () => {
     setFormData({
-      date: getInitialDate(filterMonth, filterYear),
+      date: getInitialDate(filterMonthRef.current, filterYearRef.current),
       description: '',
       category: categories[0]?.name || '',
       amount: '',
