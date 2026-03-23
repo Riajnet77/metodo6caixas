@@ -11,42 +11,70 @@ const Lancamentos = () => {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
+
+  const [filterMonth, setFilterMonth] = useState(() => {
+    return Number(localStorage.getItem('lastMonth')) || new Date().getMonth() + 1;
+  });
+  const [filterYear, setFilterYear] = useState(() => {
+    return Number(localStorage.getItem('lastYear')) || new Date().getFullYear();
+  });
+  const [filterCategory, setFilterCategory] = useState('');
+
+  // Data inicial do formulário baseada no mês/ano do filtro
+  const getInitialDate = (month, year) => {
+    const today = new Date();
+    // Se for o mês/ano atual, usa hoje; senão usa o dia 1 do mês selecionado
+    if (month === today.getMonth() + 1 && year === today.getFullYear()) {
+      return today.toISOString().split('T')[0];
+    }
+    return `${year}-${String(month).padStart(2, '0')}-01`;
+  };
+
   const [formData, setFormData] = useState({
-    date: new Date().toISOString().split('T')[0],
+    date: getInitialDate(filterMonth, filterYear),
     description: '',
     category: '',
     amount: '',
     notes: ''
   });
-  
-  // Recuperar último mês usado do localStorage ou usar mês atual
-  const [filterMonth, setFilterMonth] = useState(() => {
-    const saved = localStorage.getItem('lastUsedMonth');
-    return saved ? Number(saved) : new Date().getMonth() + 1;
-  });
-  const [filterYear, setFilterYear] = useState(() => {
-    const saved = localStorage.getItem('lastUsedYear');
-    return saved ? Number(saved) : new Date().getFullYear();
-  });
-  const [filterCategory, setFilterCategory] = useState('');
 
   useEffect(() => {
     fetchSettings();
     fetchTransactions();
   }, [filterMonth, filterYear, filterCategory]);
 
-  // Salvar último mês/ano usado quando mudar manualmente
   useEffect(() => {
-    localStorage.setItem('lastUsedMonth', filterMonth.toString());
-    localStorage.setItem('lastUsedYear', filterYear.toString());
+    localStorage.setItem('lastMonth', filterMonth.toString());
+    localStorage.setItem('lastYear', filterYear.toString());
   }, [filterMonth, filterYear]);
+
+  // Alteração 4: ao mudar mês/ano do filtro, atualiza a data do formulário automaticamente
+  const handleFilterMonthChange = (month) => {
+    setFilterMonth(month);
+    if (!editingId) {
+      setFormData(prev => ({
+        ...prev,
+        date: getInitialDate(month, filterYear)
+      }));
+    }
+  };
+
+  const handleFilterYearChange = (year) => {
+    setFilterYear(year);
+    if (!editingId) {
+      setFormData(prev => ({
+        ...prev,
+        date: getInitialDate(filterMonth, year)
+      }));
+    }
+  };
 
   const fetchSettings = async () => {
     try {
       const response = await axios.get(`${API}/settings`);
       setCategories(response.data.categories);
       if (response.data.categories.length > 0 && !formData.category) {
-        setFormData({ ...formData, category: response.data.categories[0].name });
+        setFormData(prev => ({ ...prev, category: response.data.categories[0].name }));
       }
     } catch (error) {
       console.error('Erro ao buscar categorias:', error);
@@ -84,15 +112,13 @@ const Lancamentos = () => {
         await axios.post(`${API}/transactions`, dataToSend);
       }
 
-      // Salvar último mês/ano usado após lançamento bem-sucedido
       const transactionDate = new Date(formData.date);
       const transactionMonth = transactionDate.getMonth() + 1;
       const transactionYear = transactionDate.getFullYear();
-      
-      localStorage.setItem('lastUsedMonth', transactionMonth.toString());
-      localStorage.setItem('lastUsedYear', transactionYear.toString());
-      
-      // Atualizar filtros para o mês do lançamento
+
+      localStorage.setItem('lastMonth', transactionMonth.toString());
+      localStorage.setItem('lastYear', transactionYear.toString());
+
       setFilterMonth(transactionMonth);
       setFilterYear(transactionYear);
 
@@ -118,7 +144,6 @@ const Lancamentos = () => {
 
   const handleDelete = async (id) => {
     if (!window.confirm('Tem certeza que deseja excluir esta transação?')) return;
-    
     try {
       await axios.delete(`${API}/transactions/${id}`);
       fetchTransactions();
@@ -130,7 +155,7 @@ const Lancamentos = () => {
 
   const resetForm = () => {
     setFormData({
-      date: new Date().toISOString().split('T')[0],
+      date: getInitialDate(filterMonth, filterYear),
       description: '',
       category: categories[0]?.name || '',
       amount: '',
@@ -149,7 +174,6 @@ const Lancamentos = () => {
 
   return (
     <div className="max-w-6xl mx-auto" data-testid="lancamentos-page">
-      {/* Header */}
       <div className="mb-8">
         <div className="flex items-center justify-between mb-4">
           <div>
@@ -158,16 +182,14 @@ const Lancamentos = () => {
           </div>
         </div>
 
-        {/* Filtros e Botão Nova Despesa na mesma linha */}
         <div className="bg-white rounded-xl p-6 shadow-lg">
           <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-end">
-            {/* Filtros */}
             <div className="flex-1 grid md:grid-cols-3 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Mês</label>
                 <select
                   value={filterMonth}
-                  onChange={(e) => setFilterMonth(Number(e.target.value))}
+                  onChange={(e) => handleFilterMonthChange(Number(e.target.value))}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                   data-testid="filter-month"
                 >
@@ -180,7 +202,7 @@ const Lancamentos = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Ano</label>
                 <select
                   value={filterYear}
-                  onChange={(e) => setFilterYear(Number(e.target.value))}
+                  onChange={(e) => handleFilterYearChange(Number(e.target.value))}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                   data-testid="filter-year"
                 >
@@ -205,7 +227,6 @@ const Lancamentos = () => {
               </div>
             </div>
 
-            {/* Botão Nova Despesa */}
             <button
               onClick={() => setShowForm(!showForm)}
               className="w-full lg:w-auto whitespace-nowrap flex items-center justify-center gap-2 px-6 py-2.5 bg-gradient-to-r from-amber-500 to-yellow-500 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1"
@@ -218,7 +239,6 @@ const Lancamentos = () => {
         </div>
       </div>
 
-      {/* Form */}
       {showForm && (
         <div className="bg-white rounded-xl p-6 shadow-lg mb-6">
           <h2 className="text-xl font-bold text-gray-900 mb-4">
@@ -315,7 +335,6 @@ const Lancamentos = () => {
         </div>
       )}
 
-      {/* Summary */}
       <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 mb-6 border border-blue-100">
         <div className="flex items-center justify-between">
           <div>
@@ -331,7 +350,6 @@ const Lancamentos = () => {
         </div>
       </div>
 
-      {/* Transactions List */}
       <div className="bg-white rounded-xl shadow-lg overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
@@ -347,9 +365,7 @@ const Lancamentos = () => {
             <tbody className="bg-white divide-y divide-gray-200">
               {loading ? (
                 <tr>
-                  <td colSpan="5" className="px-6 py-12 text-center text-gray-500">
-                    Carregando...
-                  </td>
+                  <td colSpan="5" className="px-6 py-12 text-center text-gray-500">Carregando...</td>
                 </tr>
               ) : transactions.length === 0 ? (
                 <tr>
