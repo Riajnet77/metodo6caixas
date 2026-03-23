@@ -20,10 +20,8 @@ const Lancamentos = () => {
   });
   const [filterCategory, setFilterCategory] = useState('');
 
-  // Data inicial do formulário baseada no mês/ano do filtro
   const getInitialDate = (month, year) => {
     const today = new Date();
-    // Se for o mês/ano atual, usa hoje; senão usa o dia 1 do mês selecionado
     if (month === today.getMonth() + 1 && year === today.getFullYear()) {
       return today.toISOString().split('T')[0];
     }
@@ -48,7 +46,6 @@ const Lancamentos = () => {
     localStorage.setItem('lastYear', filterYear.toString());
   }, [filterMonth, filterYear]);
 
-  // Alteração 4: ao mudar mês/ano do filtro, atualiza a data do formulário automaticamente
   const handleFilterMonthChange = (month) => {
     setFilterMonth(month);
     if (!editingId) {
@@ -112,15 +109,8 @@ const Lancamentos = () => {
         await axios.post(`${API}/transactions`, dataToSend);
       }
 
-      const transactionDate = new Date(formData.date);
-      const transactionMonth = transactionDate.getMonth() + 1;
-      const transactionYear = transactionDate.getFullYear();
-
-      localStorage.setItem('lastMonth', transactionMonth.toString());
-      localStorage.setItem('lastYear', transactionYear.toString());
-
-      setFilterMonth(transactionMonth);
-      setFilterYear(transactionYear);
+      localStorage.setItem('lastMonth', filterMonth.toString());
+      localStorage.setItem('lastYear', filterYear.toString());
 
       resetForm();
       fetchTransactions();
