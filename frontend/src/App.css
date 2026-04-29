@@ -37,3 +37,14 @@
   transform: translateY(-2px);
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
 }
+/* Remove marca d'água Emergent */
+[class*="emergent"],
+[id*="emergent"],
+a[href*="emergent"],
+div[style*="emergent"],
+button[class*="emergent"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
