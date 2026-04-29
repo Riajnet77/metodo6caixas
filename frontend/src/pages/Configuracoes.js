@@ -5,6 +5,45 @@ import { Save, RefreshCw, Calendar } from 'lucide-react';
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
+const CATEGORY_INFO = {
+  'Viver': {
+    emoji: '🏠',
+    cor: 'blue',
+    explicacao: 'Tudo que você precisa para viver: aluguel, alimentação, transporte, contas de água, luz, internet, plano de saúde.',
+    dica: 'Se seus gastos de sobrevivência passam de 50%, você está vivendo acima das suas posses. Hora de revisar!'
+  },
+  'Liberdade Financeira': {
+    emoji: '📈',
+    cor: 'green',
+    explicacao: 'Invista em você mesmo primeiro! Este dinheiro vai para investimentos, ações, fundos ou poupança com objetivo de multiplicar.',
+    dica: 'Nunca toque neste dinheiro. Ele trabalha por você enquanto você dorme.'
+  },
+  'Longo Prazo': {
+    emoji: '🎯',
+    cor: 'purple',
+    explicacao: 'Reserva para sonhos grandes: comprar um imóvel, trocar o carro, fazer uma reforma, viajar nas férias.',
+    dica: 'Diferente de investimento — este dinheiro será gasto, mas em algo planejado e importante.'
+  },
+  'Educação': {
+    emoji: '📚',
+    cor: 'amber',
+    explicacao: 'Invista no seu crescimento: cursos, livros, workshops, treinamentos. Conhecimento é o único ativo que ninguém pode tirar de você.',
+    dica: 'Quem investe em educação tende a ganhar mais. Este é o melhor ROI que existe.'
+  },
+  'Doação': {
+    emoji: '❤️',
+    cor: 'rose',
+    explicacao: 'Dízimo, ofertas, projetos sociais, ajudar família ou amigos em necessidade.',
+    dica: 'É dando que se recebe. Quem é generoso atrai abundância — lei universal e bíblica.'
+  },
+  'Lazer': {
+    emoji: '🎉',
+    cor: 'cyan',
+    explicacao: 'Gaste COM VOCÊ sem culpa! Restaurantes, cinema, roupas, hobbies, viagens curtas.',
+    dica: 'Este dinheiro é para aproveitar. Gastar aqui não é errado — é necessário para manter equilíbrio!'
+  },
+};
+
 const Configuracoes = () => {
   const [settings, setSettings] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -12,6 +51,7 @@ const Configuracoes = () => {
   const [message, setMessage] = useState('');
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [expandedCategory, setExpandedCategory] = useState(null);
 
   useEffect(() => {
     fetchSettings();
@@ -39,7 +79,7 @@ const Configuracoes = () => {
       });
       setMessage('✅ Configurações salvas com sucesso!');
       setTimeout(() => setMessage(''), 3000);
-      fetchSettings(); // Recarregar para pegar total_income atualizado
+      fetchSettings();
     } catch (error) {
       console.error('Erro ao salvar configurações:', error);
       setMessage('❌ Erro ao salvar configurações');
@@ -60,6 +100,18 @@ const Configuracoes = () => {
     'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
     'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
   ];
+
+  const getColorClasses = (cor) => {
+    const map = {
+      blue: { bg: 'bg-blue-50', border: 'border-blue-200', text: 'text-blue-700', badge: 'bg-blue-100 text-blue-700' },
+      green: { bg: 'bg-green-50', border: 'border-green-200', text: 'text-green-700', badge: 'bg-green-100 text-green-700' },
+      purple: { bg: 'bg-purple-50', border: 'border-purple-200', text: 'text-purple-700', badge: 'bg-purple-100 text-purple-700' },
+      amber: { bg: 'bg-amber-50', border: 'border-amber-200', text: 'text-amber-700', badge: 'bg-amber-100 text-amber-700' },
+      rose: { bg: 'bg-rose-50', border: 'border-rose-200', text: 'text-rose-700', badge: 'bg-rose-100 text-rose-700' },
+      cyan: { bg: 'bg-cyan-50', border: 'border-cyan-200', text: 'text-cyan-700', badge: 'bg-cyan-100 text-cyan-700' },
+    };
+    return map[cor] || map.blue;
+  };
 
   if (loading) {
     return (
@@ -119,62 +171,44 @@ const Configuracoes = () => {
         </div>
       )}
 
-      {/* Income Section - 3 campos */}
+      {/* Income Section */}
       <div className="bg-white rounded-xl p-6 shadow-lg mb-6">
         <h2 className="text-xl font-bold text-gray-900 mb-4">Configuração de Renda</h2>
-        
         <div className="space-y-4">
-          {/* Renda Mensal */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Renda Mensal (Fixa)
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Renda Mensal (Fixa)</label>
             <div className="flex items-center gap-4">
               <span className="text-gray-700 font-medium">R$</span>
               <input
                 type="number"
                 value={settings?.monthly_income || 0}
-                onChange={(e) => setSettings({ 
-                  ...settings, 
-                  monthly_income: parseFloat(e.target.value) || 0 
-                })}
+                onChange={(e) => setSettings({ ...settings, monthly_income: parseFloat(e.target.value) || 0 })}
                 className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-lg"
                 placeholder="5000.00"
                 step="0.01"
                 data-testid="monthly-income-input"
               />
             </div>
-            <p className="text-sm text-gray-500 mt-1">
-              💡 Salário fixo mensal
-            </p>
+            <p className="text-sm text-gray-500 mt-1">💡 Salário fixo mensal</p>
           </div>
 
-          {/* Renda Extra */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Renda Extra (Variável)
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Renda Extra (Variável)</label>
             <div className="flex items-center gap-4">
               <span className="text-gray-700 font-medium">R$</span>
               <input
                 type="number"
                 value={settings?.extra_income || 0}
-                onChange={(e) => setSettings({ 
-                  ...settings, 
-                  extra_income: parseFloat(e.target.value) || 0 
-                })}
+                onChange={(e) => setSettings({ ...settings, extra_income: parseFloat(e.target.value) || 0 })}
                 className="flex-1 px-4 py-3 border border-amber-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-lg bg-amber-50"
                 placeholder="0.00"
                 step="0.01"
                 data-testid="extra-income-input"
               />
             </div>
-            <p className="text-sm text-gray-500 mt-1">
-              💰 Freelance, bônus, comissões (pode alterar a qualquer momento)
-            </p>
+            <p className="text-sm text-gray-500 mt-1">💰 Freelance, bônus, comissões</p>
           </div>
 
-          {/* Renda Total (Calculado) */}
           <div className="pt-4 border-t border-gray-200">
             <div className="flex justify-between items-center p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border-2 border-green-200">
               <span className="text-lg font-bold text-gray-900">Renda Total</span>
@@ -182,16 +216,14 @@ const Configuracoes = () => {
                 R$ {((settings?.monthly_income || 0) + (settings?.extra_income || 0)).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
               </span>
             </div>
-            <p className="text-sm text-gray-500 mt-2 text-center">
-              ✅ Este valor será usado para calcular os percentuais ideais
-            </p>
+            <p className="text-sm text-gray-500 mt-2 text-center">✅ Este valor será usado para calcular os percentuais ideais</p>
           </div>
         </div>
       </div>
 
       {/* Categories Section */}
       <div className="bg-white rounded-xl p-6 shadow-lg mb-6">
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-2">
           <h2 className="text-xl font-bold text-gray-900">Categorias e Percentuais</h2>
           <div className={`px-4 py-2 rounded-lg font-semibold ${
             Math.abs(totalPercentage - 100) < 0.01 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
@@ -199,58 +231,96 @@ const Configuracoes = () => {
             Total: {totalPercentage.toFixed(0)}%
           </div>
         </div>
+        <p className="text-sm text-gray-500 mb-6">
+          Clique em cada categoria para ver o que ela significa e como usar corretamente.
+        </p>
 
         <div className="space-y-4">
           {settings?.categories.map((category, index) => {
             const totalIncome = (settings.monthly_income || 0) + (settings.extra_income || 0);
             const idealAmount = (totalIncome * category.ideal_percentage) / 100;
+            const info = CATEGORY_INFO[category.name] || { emoji: '💰', cor: 'blue', explicacao: category.description, dica: '' };
+            const colors = getColorClasses(info.cor);
+            const isExpanded = expandedCategory === index;
+
             return (
-              <div key={index} className="border border-gray-200 rounded-lg p-4">
-                <div className="grid md:grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Nome da Categoria</label>
-                    <input
-                      type="text"
-                      value={category.name}
-                      onChange={(e) => handleCategoryChange(index, 'name', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                      data-testid={`category-name-${index}`}
-                    />
+              <div key={index} className={`border-2 rounded-xl overflow-hidden ${colors.border}`}>
+                {/* Cabeçalho clicável */}
+                <button
+                  onClick={() => setExpandedCategory(isExpanded ? null : index)}
+                  className={`w-full p-4 flex items-center justify-between ${colors.bg} hover:opacity-90 transition-all`}
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl">{info.emoji}</span>
+                    <div className="text-left">
+                      <p className={`font-bold text-lg ${colors.text}`}>{category.name}</p>
+                      <p className="text-sm text-gray-600">
+                        {category.ideal_percentage}% — R$ {idealAmount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Percentual Ideal (%)</label>
-                    <input
-                      type="number"
-                      value={category.ideal_percentage}
-                      onChange={(e) => handleCategoryChange(index, 'ideal_percentage', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                      step="0.1"
-                      min="0"
-                      max="100"
-                      data-testid={`category-percentage-${index}`}
-                    />
+                  <span className="text-gray-400 text-sm">{isExpanded ? '▲ fechar' : '▼ ver detalhes'}</span>
+                </button>
+
+                {/* Explicação expandida */}
+                {isExpanded && (
+                  <div className="p-4 bg-white border-t border-gray-100">
+                    <div className={`p-3 rounded-lg ${colors.bg} mb-4`}>
+                      <p className={`text-sm font-semibold ${colors.text} mb-1`}>📋 O que entra aqui:</p>
+                      <p className="text-sm text-gray-700">{info.explicacao}</p>
+                    </div>
+                    <div className="p-3 rounded-lg bg-yellow-50 border border-yellow-200 mb-4">
+                      <p className="text-sm font-semibold text-yellow-700 mb-1">💡 Dica:</p>
+                      <p className="text-sm text-gray-700">{info.dica}</p>
+                    </div>
+
+                    <div className="grid md:grid-cols-3 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Nome</label>
+                        <input
+                          type="text"
+                          value={category.name}
+                          onChange={(e) => handleCategoryChange(index, 'name', e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
+                          data-testid={`category-name-${index}`}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Percentual (%)</label>
+                        <input
+                          type="number"
+                          value={category.ideal_percentage}
+                          onChange={(e) => handleCategoryChange(index, 'ideal_percentage', e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
+                          step="0.1"
+                          min="0"
+                          max="100"
+                          data-testid={`category-percentage-${index}`}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Valor Ideal (R$)</label>
+                        <input
+                          type="text"
+                          value={`R$ ${idealAmount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
+                          disabled
+                          className="w-full px-3 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-700"
+                        />
+                      </div>
+                    </div>
+                    <div className="mt-3">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Descrição personalizada</label>
+                      <input
+                        type="text"
+                        value={category.description}
+                        onChange={(e) => handleCategoryChange(index, 'description', e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 text-sm"
+                        placeholder="Ex: Moradia, alimentação, transporte"
+                        data-testid={`category-description-${index}`}
+                      />
+                    </div>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Valor Ideal (R$)</label>
-                    <input
-                      type="text"
-                      value={`R$ ${idealAmount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
-                      disabled
-                      className="w-full px-3 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-700"
-                    />
-                  </div>
-                </div>
-                <div className="mt-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Descrição</label>
-                  <input
-                    type="text"
-                    value={category.description}
-                    onChange={(e) => handleCategoryChange(index, 'description', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-sm"
-                    placeholder="Ex: Moradia, alimentação, transporte"
-                    data-testid={`category-description-${index}`}
-                  />
-                </div>
+                )}
               </div>
             );
           })}
@@ -271,9 +341,7 @@ const Configuracoes = () => {
           "Ao SENHOR pertence a terra e tudo o que nela existe,<br />
           o mundo e os que nele vivem."
         </p>
-        <p className="text-center text-sm text-blue-600 font-semibold mt-2">
-          Salmos 24:1
-        </p>
+        <p className="text-center text-sm text-blue-600 font-semibold mt-2">Salmos 24:1</p>
         <p className="text-center text-sm text-gray-600 mt-2">
           Lembre-se: você é um administrador, não o dono. Gerencie com sabedoria!
         </p>
