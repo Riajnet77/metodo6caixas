@@ -181,8 +181,9 @@ const Configuracoes = () => {
               <span className="text-gray-700 font-medium">R$</span>
               <input
                 type="number"
-                value={settings?.monthly_income || 0}
+                value={settings?.monthly_income || ''}
                 onChange={(e) => setSettings({ ...settings, monthly_income: parseFloat(e.target.value) || 0 })}
+                placeholder="Digite sua renda mensal"
                 className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-lg"
                 placeholder="5000.00"
                 step="0.01"
@@ -198,8 +199,9 @@ const Configuracoes = () => {
               <span className="text-gray-700 font-medium">R$</span>
               <input
                 type="number"
-                value={settings?.extra_income || 0}
+                value={settings?.extra_income || ''}
                 onChange={(e) => setSettings({ ...settings, extra_income: parseFloat(e.target.value) || 0 })}
+                placeholder="Digite sua renda extra"
                 className="flex-1 px-4 py-3 border border-amber-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-lg bg-amber-50"
                 placeholder="0.00"
                 step="0.01"
