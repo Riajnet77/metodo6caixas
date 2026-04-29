@@ -1,341 +1,169 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, TrendingUp, BookOpen, Target, Heart, Settings, PlusCircle, BarChart2, CheckCircle } from 'lucide-react';
+import { ArrowRight, Settings, PlusCircle, BarChart2, CheckCircle, BookOpen } from 'lucide-react';
 
 const Home = () => {
   return (
-    <div className="max-w-7xl mx-auto">
-      {/* Hero Section */}
-      <div className="text-center py-12 lg:py-20">
-        <div className="inline-block mb-4 px-4 py-2 bg-amber-100 rounded-full">
-          <span className="text-amber-700 font-semibold text-sm">Transforme Sua Realidade Financeira</span>
+    <div className="max-w-4xl mx-auto">
+
+      {/* HERO — Provocar a dor */}
+      <div className="text-center py-12">
+        <div className="inline-block mb-4 px-4 py-2 bg-red-100 rounded-full">
+          <span className="text-red-700 font-semibold text-sm">Você se identifica com isso?</span>
         </div>
-        <h1 className="text-4xl lg:text-6xl font-bold text-gray-900 mb-6 font-serif">
-          O Hábito da Economia<br />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-600 to-yellow-500">
-            e Gestão Financeira
+        <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6 font-serif leading-tight">
+          Seu dinheiro acaba<br />
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-amber-500">
+            antes do mês terminar?
           </span>
         </h1>
-        <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-          Aprenda a criar hábitos financeiros sólidos que transformam pensamentos em prosperidade,
-          baseados em princípios eternos e sabedoria prática
+        <p className="text-xl text-gray-600 mb-4 max-w-xl mx-auto">
+          Você trabalha muito, mas no final do mês não sobra nada — e você não sabe exatamente para onde o dinheiro foi.
         </p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link
-            to="/dashboard"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-yellow-500 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-            data-testid="comecar-button"
-          >
-            Iniciar Jornada
-            <ArrowRight className="w-5 h-5" />
-          </Link>
-          <Link
-            to="/ebook"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-white text-gray-700 font-semibold rounded-lg shadow-md hover:shadow-lg border-2 border-gray-200"
-            data-testid="ebook-button"
-          >
-            <BookOpen className="w-5 h-5" />
-            Ler Conteúdo Completo
-          </Link>
+        <p className="text-lg text-amber-700 font-semibold mb-8">
+          Este sistema foi feito para resolver exatamente isso. 👇
+        </p>
+
+        <Link
+          to="/configuracoes"
+          className="inline-flex items-center gap-2 px-10 py-5 bg-gradient-to-r from-amber-500 to-yellow-500 text-white text-xl font-bold rounded-xl shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all"
+          data-testid="comecar-button"
+        >
+          Começar agora — leva 2 minutos
+          <ArrowRight className="w-6 h-6" />
+        </Link>
+      </div>
+
+      {/* O QUE É O MÉTODO — Simples e direto */}
+      <div className="bg-white rounded-xl p-8 shadow-lg mb-8">
+        <h2 className="text-2xl font-bold text-gray-900 mb-2 text-center font-serif">
+          O que é o Método 6 Caixas?
+        </h2>
+        <p className="text-center text-gray-500 mb-6">Uma regra simples para dividir seu dinheiro todo mês</p>
+
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          {[
+            { pct: '50%', nome: 'Viver', desc: 'Aluguel, comida, contas', cor: 'blue' },
+            { pct: '10%', nome: 'Investir', desc: 'Sua aposentadoria', cor: 'green' },
+            { pct: '10%', nome: 'Sonhos', desc: 'Carro, viagem, casa', cor: 'purple' },
+            { pct: '10%', nome: 'Aprender', desc: 'Cursos e livros', cor: 'amber' },
+            { pct: '10%', nome: 'Doação', desc: 'Ajudar o próximo', cor: 'rose' },
+            { pct: '10%', nome: 'Lazer', desc: 'Se divertir sem culpa', cor: 'cyan' },
+          ].map((cat, i) => (
+            <div key={i} className={`p-4 bg-${cat.cor}-50 rounded-xl border border-${cat.cor}-100 text-center`}>
+              <p className={`text-2xl font-bold text-${cat.cor}-600`}>{cat.pct}</p>
+              <p className="font-semibold text-gray-900">{cat.nome}</p>
+              <p className="text-xs text-gray-500 mt-1">{cat.desc}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-6 p-4 bg-amber-50 rounded-lg border border-amber-200 text-center">
+          <p className="text-gray-700 font-medium">
+            💡 <strong>A ideia é simples:</strong> cada real que entra já tem um destino certo. Sem adivinhação, sem culpa.
+          </p>
         </div>
       </div>
 
-      {/* ===== COMO USAR O SISTEMA ===== */}
-      <div className="bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl p-8 mb-12 border-2 border-amber-200">
-        <div className="text-center mb-8">
-          <span className="inline-block px-4 py-1 bg-amber-500 text-white text-sm font-bold rounded-full mb-3">
-            GUIA DE USO
-          </span>
-          <h2 className="text-2xl font-bold text-gray-900 font-serif">
-            Como usar o sistema em 4 passos
-          </h2>
-          <p className="text-gray-600 mt-2">Siga esta sequência para obter os melhores resultados</p>
-        </div>
+      {/* COMO USAR — 4 passos ultra simples */}
+      <div className="bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl p-8 mb-8 border-2 border-amber-200">
+        <h2 className="text-2xl font-bold text-gray-900 mb-2 text-center font-serif">
+          Por onde começar?
+        </h2>
+        <p className="text-center text-gray-500 mb-8">Siga estes 4 passos na ordem</p>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="space-y-4">
           {/* Passo 1 */}
-          <div className="bg-white rounded-xl p-6 shadow-md relative">
-            <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 w-8 h-8 bg-amber-500 text-white rounded-full flex items-center justify-center font-bold text-lg">
+          <div className="bg-white rounded-xl p-5 shadow-sm flex items-center gap-5">
+            <div className="w-12 h-12 bg-amber-500 text-white rounded-full flex items-center justify-center font-bold text-xl flex-shrink-0">
               1
             </div>
-            <div className="flex flex-col items-center text-center mt-2">
-              <Settings className="w-10 h-10 text-amber-500 mb-3" />
-              <h3 className="font-bold text-gray-900 mb-2">Configure sua Renda</h3>
-              <p className="text-sm text-gray-600 mb-4">
-                Acesse <strong>Configurações</strong> e informe sua renda mensal. O sistema calculará automaticamente quanto destinar para cada categoria.
-              </p>
-              <Link
-                to="/configuracoes"
-                className="inline-flex items-center gap-1 px-4 py-2 bg-amber-500 text-white text-sm font-semibold rounded-lg hover:bg-amber-600"
-              >
-                Ir para Configurações
-                <ArrowRight className="w-4 h-4" />
-              </Link>
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-1">
+                <Settings className="w-5 h-5 text-amber-500" />
+                <h3 className="font-bold text-gray-900">Diga quanto você ganha</h3>
+              </div>
+              <p className="text-sm text-gray-600">Acesse <strong>Configurações</strong> e informe sua renda mensal. Pronto — o sistema calcula tudo automaticamente.</p>
             </div>
+            <Link to="/configuracoes" className="hidden md:flex items-center gap-1 px-4 py-2 bg-amber-500 text-white text-sm font-semibold rounded-lg hover:bg-amber-600 flex-shrink-0">
+              Ir <ArrowRight className="w-4 h-4" />
+            </Link>
           </div>
 
           {/* Passo 2 */}
-          <div className="bg-white rounded-xl p-6 shadow-md relative">
-            <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold text-lg">
+          <div className="bg-white rounded-xl p-5 shadow-sm flex items-center gap-5">
+            <div className="w-12 h-12 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold text-xl flex-shrink-0">
               2
             </div>
-            <div className="flex flex-col items-center text-center mt-2">
-              <PlusCircle className="w-10 h-10 text-blue-500 mb-3" />
-              <h3 className="font-bold text-gray-900 mb-2">Lance suas Despesas</h3>
-              <p className="text-sm text-gray-600 mb-4">
-                Acesse <strong>Lançamentos</strong> e registre cada gasto na categoria correta. Faça isso diariamente para manter o controle.
-              </p>
-              <Link
-                to="/lancamentos"
-                className="inline-flex items-center gap-1 px-4 py-2 bg-blue-500 text-white text-sm font-semibold rounded-lg hover:bg-blue-600"
-              >
-                Ir para Lançamentos
-                <ArrowRight className="w-4 h-4" />
-              </Link>
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-1">
+                <PlusCircle className="w-5 h-5 text-blue-500" />
+                <h3 className="font-bold text-gray-900">Lance o que você gasta</h3>
+              </div>
+              <p className="text-sm text-gray-600">Acesse <strong>Lançamentos</strong> e registre seus gastos diariamente. Escolha a categoria certa para cada despesa.</p>
             </div>
+            <Link to="/lancamentos" className="hidden md:flex items-center gap-1 px-4 py-2 bg-blue-500 text-white text-sm font-semibold rounded-lg hover:bg-blue-600 flex-shrink-0">
+              Ir <ArrowRight className="w-4 h-4" />
+            </Link>
           </div>
 
           {/* Passo 3 */}
-          <div className="bg-white rounded-xl p-6 shadow-md relative">
-            <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center font-bold text-lg">
+          <div className="bg-white rounded-xl p-5 shadow-sm flex items-center gap-5">
+            <div className="w-12 h-12 bg-green-500 text-white rounded-full flex items-center justify-center font-bold text-xl flex-shrink-0">
               3
             </div>
-            <div className="flex flex-col items-center text-center mt-2">
-              <BarChart2 className="w-10 h-10 text-green-500 mb-3" />
-              <h3 className="font-bold text-gray-900 mb-2">Acompanhe o Dashboard</h3>
-              <p className="text-sm text-gray-600 mb-4">
-                Acesse o <strong>Dashboard</strong> para visualizar gráficos e comparar o ideal com o realizado em cada categoria.
-              </p>
-              <Link
-                to="/dashboard"
-                className="inline-flex items-center gap-1 px-4 py-2 bg-green-500 text-white text-sm font-semibold rounded-lg hover:bg-green-600"
-              >
-                Ir para Dashboard
-                <ArrowRight className="w-4 h-4" />
-              </Link>
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-1">
+                <BarChart2 className="w-5 h-5 text-green-500" />
+                <h3 className="font-bold text-gray-900">Veja para onde o dinheiro vai</h3>
+              </div>
+              <p className="text-sm text-gray-600">Acesse o <strong>Dashboard</strong> e veja gráficos mostrando se você está dentro ou fora do limite de cada categoria.</p>
             </div>
+            <Link to="/dashboard" className="hidden md:flex items-center gap-1 px-4 py-2 bg-green-500 text-white text-sm font-semibold rounded-lg hover:bg-green-600 flex-shrink-0">
+              Ir <ArrowRight className="w-4 h-4" />
+            </Link>
           </div>
 
           {/* Passo 4 */}
-          <div className="bg-white rounded-xl p-6 shadow-md relative">
-            <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 w-8 h-8 bg-purple-500 text-white rounded-full flex items-center justify-center font-bold text-lg">
+          <div className="bg-white rounded-xl p-5 shadow-sm flex items-center gap-5">
+            <div className="w-12 h-12 bg-purple-500 text-white rounded-full flex items-center justify-center font-bold text-xl flex-shrink-0">
               4
             </div>
-            <div className="flex flex-col items-center text-center mt-2">
-              <CheckCircle className="w-10 h-10 text-purple-500 mb-3" />
-              <h3 className="font-bold text-gray-900 mb-2">Defina suas Metas</h3>
-              <p className="text-sm text-gray-600 mb-4">
-                Acesse <strong>Metas</strong> e defina objetivos financeiros concretos. Acompanhe seu progresso e celebre cada conquista!
-              </p>
-              <Link
-                to="/metas"
-                className="inline-flex items-center gap-1 px-4 py-2 bg-purple-500 text-white text-sm font-semibold rounded-lg hover:bg-purple-600"
-              >
-                Ir para Metas
-                <ArrowRight className="w-4 h-4" />
-              </Link>
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-1">
+                <CheckCircle className="w-5 h-5 text-purple-500" />
+                <h3 className="font-bold text-gray-900">Defina um sonho e realize</h3>
+              </div>
+              <p className="text-sm text-gray-600">Acesse <strong>Metas</strong> e coloque um objetivo concreto. O sistema acompanha seu progresso até você chegar lá.</p>
             </div>
-          </div>
-        </div>
-
-        {/* Dica extra */}
-        <div className="mt-6 p-4 bg-white rounded-lg border border-amber-200 flex items-start gap-3">
-          <span className="text-2xl">💡</span>
-          <div>
-            <p className="font-semibold text-gray-900">Dica importante:</p>
-            <p className="text-sm text-gray-600">
-              Leia o <strong>Conteúdo Completo</strong> para entender a filosofia por trás do método. 
-              Veja também os <strong>Exemplos</strong> de perfis iniciante e veterano para se inspirar!
-            </p>
+            <Link to="/metas" className="hidden md:flex items-center gap-1 px-4 py-2 bg-purple-500 text-white text-sm font-semibold rounded-lg hover:bg-purple-600 flex-shrink-0">
+              Ir <ArrowRight className="w-4 h-4" />
+            </Link>
           </div>
         </div>
       </div>
 
-      {/* Wisdom Quote */}
-      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-8 mb-12 border border-blue-100">
-        <p className="text-center text-lg text-gray-700 italic font-serif">
-          "Os pensamentos dos diligentes conduzem à abundância,<br />
-          pois eles trabalham corretamente com um propósito claro."
+      {/* QUOTE */}
+      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 mb-8 border border-blue-100 text-center">
+        <p className="text-lg text-gray-700 italic font-serif">
+          "Os pensamentos dos diligentes conduzem à abundância."
         </p>
-        <p className="text-center text-sm text-blue-600 font-semibold mt-2">
-          Provérbios 21:5 - Princípio do Rei Salomão
-        </p>
+        <p className="text-sm text-blue-600 font-semibold mt-2">Provérbios 21:5</p>
       </div>
 
-      {/* Core Concepts */}
-      <div className="grid md:grid-cols-3 gap-8 mb-12">
-        <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl card-hover">
-          <div className="w-12 h-12 bg-gradient-to-br from-green-400 to-green-600 rounded-lg flex items-center justify-center mb-4">
-            <TrendingUp className="w-6 h-6 text-white" />
-          </div>
-          <h3 className="text-xl font-bold text-gray-900 mb-2">Hábitos que Prosperam</h3>
-          <p className="text-gray-600">
-            Economizar é uma questão de hábito. Pela repetição, forme o piloto automático da prosperidade
-          </p>
-        </div>
-
-        <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl card-hover">
-          <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-yellow-600 rounded-lg flex items-center justify-center mb-4">
-            <Target className="w-6 h-6 text-white" />
-          </div>
-          <h3 className="text-xl font-bold text-gray-900 mb-2">Objetivos e Metas Claras</h3>
-          <p className="text-gray-600">
-            Pensamentos geram emoções, emoções geram crenças, crenças geram ações que criam resultados
-          </p>
-        </div>
-
-        <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl card-hover">
-          <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-indigo-600 rounded-lg flex items-center justify-center mb-4">
-            <Heart className="w-6 h-6 text-white" />
-          </div>
-          <h3 className="text-xl font-bold text-gray-900 mb-2">Sabedoria de Salomão</h3>
-          <p className="text-gray-600">
-            Aplique os 10 princípios bíblicos de finanças do homem mais próspero da história
-          </p>
-        </div>
-      </div>
-
-      {/* 6 Categories System */}
-      <div className="bg-white rounded-xl p-8 shadow-lg mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center font-serif">
-          Sistema de 6 Categorias para Gestão Financeira
-        </h2>
-        <p className="text-center text-gray-600 mb-8">
-          Divida sua renda de forma inteligente e equilibrada
-        </p>
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div className="flex items-start gap-3">
-            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-              <span className="text-blue-600 font-bold">50%</span>
-            </div>
-            <div>
-              <h4 className="font-semibold text-gray-900">Viver</h4>
-              <p className="text-sm text-gray-600">Ajuste todas as despesas do cotidiano com 50% dos ganhos mensais</p>
-            </div>
-          </div>
-          <div className="flex items-start gap-3">
-            <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-              <span className="text-green-600 font-bold">10%</span>
-            </div>
-            <div>
-              <h4 className="font-semibold text-gray-900">Liberdade Financeira</h4>
-              <p className="text-sm text-gray-600">Pague-se primeiro! Poupe para aumentar rendimentos</p>
-            </div>
-          </div>
-          <div className="flex items-start gap-3">
-            <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
-              <span className="text-purple-600 font-bold">10%</span>
-            </div>
-            <div>
-              <h4 className="font-semibold text-gray-900">Longo Prazo</h4>
-              <p className="text-sm text-gray-600">Imóvel próprio, veículo, reforma, férias</p>
-            </div>
-          </div>
-          <div className="flex items-start gap-3">
-            <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0">
-              <span className="text-amber-600 font-bold">10%</span>
-            </div>
-            <div>
-              <h4 className="font-semibold text-gray-900">Educação</h4>
-              <p className="text-sm text-gray-600">Invista em conhecimentos para ganhar mais</p>
-            </div>
-          </div>
-          <div className="flex items-start gap-3">
-            <div className="w-10 h-10 bg-rose-100 rounded-lg flex items-center justify-center flex-shrink-0">
-              <span className="text-rose-600 font-bold">10%</span>
-            </div>
-            <div>
-              <h4 className="font-semibold text-gray-900">Doação</h4>
-              <p className="text-sm text-gray-600">É dando que se recebe - Lei universal</p>
-            </div>
-          </div>
-          <div className="flex items-start gap-3">
-            <div className="w-10 h-10 bg-cyan-100 rounded-lg flex items-center justify-center flex-shrink-0">
-              <span className="text-cyan-600 font-bold">10%</span>
-            </div>
-            <div>
-              <h4 className="font-semibold text-gray-900">Lazer</h4>
-              <p className="text-sm text-gray-600">Gaste com você, sem culpa, sinta-se próspero</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Key Principles */}
-      <div className="bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl p-8 mb-12 border border-amber-200">
-        <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center font-serif">
-          Princípios Fundamentais
-        </h2>
-        <div className="grid md:grid-cols-2 gap-6">
-          <div className="flex items-start gap-3">
-            <div className="w-8 h-8 bg-amber-500 text-white rounded-full flex items-center justify-center flex-shrink-0 font-bold">1</div>
-            <div>
-              <h4 className="font-semibold text-gray-900 mb-1">Formação do Hábito</h4>
-              <p className="text-sm text-gray-700">O hábito de economizar, no início, é mais importante do que o próprio valor economizado</p>
-            </div>
-          </div>
-          <div className="flex items-start gap-3">
-            <div className="w-8 h-8 bg-amber-500 text-white rounded-full flex items-center justify-center flex-shrink-0 font-bold">2</div>
-            <div>
-              <h4 className="font-semibold text-gray-900 mb-1">Poder do Pensamento</h4>
-              <p className="text-sm text-gray-700">Pensamentos criam emoções, sentimentos, crenças, ações e resultados</p>
-            </div>
-          </div>
-          <div className="flex items-start gap-3">
-            <div className="w-8 h-8 bg-amber-500 text-white rounded-full flex items-center justify-center flex-shrink-0 font-bold">3</div>
-            <div>
-              <h4 className="font-semibold text-gray-900 mb-1">Diligência</h4>
-              <p className="text-sm text-gray-700">Seja cuidadoso, zeloso, pesquisador - busque a excelência em tudo</p>
-            </div>
-          </div>
-          <div className="flex items-start gap-3">
-            <div className="w-8 h-8 bg-amber-500 text-white rounded-full flex items-center justify-center flex-shrink-0 font-bold">4</div>
-            <div>
-              <h4 className="font-semibold text-gray-900 mb-1">Generosidade</h4>
-              <p className="text-sm text-gray-700">A pessoa generosa terá sempre mais, recebendo de volta o bem que faz</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Three Ways to Earn */}
-      <div className="bg-white rounded-xl p-8 shadow-lg mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center font-serif">
-          Três Formas de Ganhar Dinheiro
-        </h2>
-        <div className="space-y-4">
-          <div className="p-4 bg-green-50 rounded-lg border-l-4 border-green-500">
-            <h4 className="font-bold text-green-900 mb-2">💵 Ajude pessoas a ganharem dinheiro</h4>
-            <p className="text-gray-700 text-sm">Seja o melhor no que faz, estruture um curso e compartilhe conhecimento</p>
-          </div>
-          <div className="p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500">
-            <h4 className="font-bold text-blue-900 mb-2">🔧 Ajude pessoas a resolver problemas</h4>
-            <p className="text-gray-700 text-sm">Resolvendo problemas alheios você pode ganhar muito - você só recebe aquilo que dá</p>
-          </div>
-          <div className="p-4 bg-purple-50 rounded-lg border-l-4 border-purple-500">
-            <h4 className="font-bold text-purple-900 mb-2">🌟 Ajude na autoconfiança e autoconhecimento</h4>
-            <p className="text-gray-700 text-sm">Ensine leis universais, incentive pessoas - quando você ensina, aprende muito mais</p>
-          </div>
-        </div>
-      </div>
-
-      {/* CTA */}
-      <div className="text-center py-12">
-        <h2 className="text-3xl font-bold text-gray-900 mb-4 font-serif">
-          Pronto para Criar o Hábito da Prosperidade?
-        </h2>
-        <p className="text-gray-600 mb-8">
-          "Todo resultado que você deseja na sua vida está naquilo que você ainda não aprendeu"
-        </p>
+      {/* CTA FINAL */}
+      <div className="text-center pb-12">
+        <p className="text-gray-500 mb-4">Quer entender mais fundo a filosofia do método?</p>
         <Link
-          to="/configuracoes"
-          className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-          data-testid="configurar-button"
+          to="/ebook"
+          className="inline-flex items-center gap-2 px-6 py-3 bg-white text-gray-700 font-semibold rounded-lg shadow-md hover:shadow-lg border-2 border-gray-200"
+          data-testid="ebook-button"
         >
-          Configurar Minha Renda Agora
-          <ArrowRight className="w-5 h-5" />
+          <BookOpen className="w-5 h-5" />
+          Ler o Conteúdo Completo
         </Link>
       </div>
+
     </div>
   );
 };
