@@ -180,14 +180,14 @@ async def get_or_create_settings(user_id: str, company_id: str, month: int, year
     
     # Create default settings for this month
     default_settings = UserSettings(
-        user_id=user_id,
-        company_id=company_id,
-        month=month,
-        year=year,
-        monthly_income=5000.0,
-        extra_income=0.0,
-        total_income=5000.0
-    )
+    user_id=user_id,
+    company_id=company_id,
+    month=month,
+    year=year,
+    monthly_income=0.0,
+    extra_income=0.0,
+    total_income=0.0
+)
     doc = default_settings.model_dump()
     doc['created_at'] = doc['created_at'].isoformat()
     doc['updated_at'] = doc['updated_at'].isoformat()
