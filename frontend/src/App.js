@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useSearchParams } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import PrivateRoute from './components/PrivateRoute';
 import Layout from './components/Layout';
@@ -12,62 +12,61 @@ import Lancamentos from './pages/Lancamentos';
 import Metas from './pages/Metas';
 import Ebook from './pages/Ebook';
 import Exemplos from './pages/Exemplos';
-// ✅ NOVO: Importa o Passo Zero
 import PassoZero from './pages/PassoZero';
 import './App.css';
 
-function App() {
-  // ✅ NOVO: Estados para controle do Passo Zero
+function AppContent() {
+  const [searchParams] = useSearchParams();
   const [perfil, setPerfil] = useState(null);
   const [passoZeroConcluido, setPassoZeroConcluido] = useState(false);
   const [carregando, setCarregando] = useState(true);
 
-  // ✅ NOVO: Verifica se usuário veio do diagnóstico endividado
   useEffect(() => {
-    const perfilDiagnostico = localStorage.getItem('diagnostico_perfil');
-    const dadosDiagnostico = JSON.parse(localStorage.getItem('diagnostico_dados') || '{}');
-    const passoZeroStatus = localStorage.getItem('passo_zero_concluido');
+    // ✅ LÊ DADOS DA URL (vindos do diagnóstico em outro domínio)
+    const perfilURL = searchParams.get('perfil');
+    const receita = searchParams.get('receita');
 
-    if (perfilDiagnostico === 'endividado' && dadosDiagnostico.receita) {
+    if (perfilURL === 'endividado' && receita) {
       setPerfil({
         tipo: 'endividado',
-        dados: dadosDiagnostico
+        dados: {
+          receita: Number(receita),
+          totalGastos: Number(searchParams.get('gastos') || 0),
+          totalFixos: Number(searchParams.get('fixos') || 0),
+          totalVariaveis: Number(searchParams.get('variaveis') || 0),
+          totalCartao: Number(searchParams.get('cartao') || 0),
+          deficitMensal: Number(searchParams.get('deficit') || 0),
+        }
       });
     }
 
+    // ✅ Também verifica localStorage (para usuários que já fizeram Passo Zero)
+    const passoZeroStatus = localStorage.getItem('passo_zero_concluido');
     if (passoZeroStatus === 'true') {
       setPassoZeroConcluido(true);
     }
 
     setCarregando(false);
-  }, []);
+  }, [searchParams]);
 
-  // ✅ NOVO: Função chamada quando conclui o Passo Zero
   const handleConcluirPassoZero = () => {
     localStorage.setItem('passo_zero_concluido', 'true');
-    localStorage.removeItem('diagnostico_perfil');
     setPassoZeroConcluido(true);
     setPerfil(null);
   };
 
-  // ✅ NOVO: Mostra loading enquanto verifica
   if (carregando) {
     return (
       <div style={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: '#0f0f0f',
-        color: '#ffffff',
-        fontSize: 14,
+        minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
+        background: '#0f0f0f', color: '#ffffff', fontSize: 14,
       }}>
         Carregando...
       </div>
     );
   }
 
-  // ✅ NOVO: Se endividado e não concluiu Passo Zero, mostra ele primeiro
+  // Se endividado e não concluiu Passo Zero → mostra ele primeiro
   if (perfil?.tipo === 'endividado' && !passoZeroConcluido) {
     return (
       <PassoZero
@@ -77,16 +76,13 @@ function App() {
     );
   }
 
-  // ✅ ORIGINAL: Rotas normais do Método 6 Caixas (inalterado)
+  // Rotas normais
   return (
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          {/* Public Routes */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-
-          {/* Protected Routes */}
           <Route path="/" element={
             <PrivateRoute>
               <Layout />
@@ -100,11 +96,18 @@ function App() {
             <Route path="ebook" element={<Ebook />} />
             <Route path="exemplos" element={<Exemplos />} />
           </Route>
-          {/* Redirect any unknown routes to home */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
+  );
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <AppContent />
+    </BrowserRouter>
   );
 }
 
