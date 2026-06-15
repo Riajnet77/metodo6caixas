@@ -90,6 +90,22 @@ const Ebook = () => {
           ],
           exercise: "Escolha uma das três lógicas para começar ESTA SEMANA. Identifique 1 gasto desnecessário OU 1 oportunidade de renda extra.",
           verse: "\"Gaste menos do que ganhe, gaste por necessidade, evite a vaidade\" - Provérbios 21:20"
+        },
+        {
+          id: 7,
+          title: "Por Onde Começar — Especialmente se Você Tem Dívidas",
+          subtitle: "A Ordem Correta para Iniciar o Método",
+          content: [
+            "Se você está endividado e pagando juros, existe uma ordem específica para iniciar o método. Não se culpe — a grande maioria das pessoas começa exatamente nessa situação.",
+            "⚠️ DÍVIDAS EM PRIMEIRO LUGAR: Enquanto você estiver pagando juros de dívidas, suspenda temporariamente as doações e redirecione esse valor para quitar o endividamento mais rapidamente. Dívidas com juros são um buraco no balde — de nada adianta encher se continua vazando.",
+            "Uma vez que suas dívidas estejam administradas e os juros sob controle, retome as doações normalmente. A generosidade é uma lei universal, mas ela funciona muito melhor quando sua casa está em ordem.",
+            "🚀 NÃO SE PREOCUPE COM OS VALORES INICIAIS: Quando iniciar a distribuição da sua renda nas 6 categorias, não se preocupe com os valores iniciais. No começo, o mais importante não é quanto você distribui, mas SIM a criação do novo hábito.",
+            "Separe R$ 1, R$ 5, R$ 10 para cada caixa — não importa. O que importa é repetir esse gesto todo mês, todo salário, toda renda que entrar. Com o tempo, os valores crescem naturalmente.",
+            "📊 FAÇA O DIAGNÓSTICO FINANCEIRO PRIMEIRO: Antes de começar, é fundamental entender sua situação atual. Utilize nosso Diagnóstico Financeiro para mapear suas dívidas, receitas e despesas com clareza. Um diagnóstico honesto é o ponto de partida para qualquer transformação real.",
+            "Acesse o Diagnóstico Financeiro em: https://diagnostico--financeiro.vercel.app — faça agora antes de avançar para as configurações do método."
+          ],
+          exercise: "1. Acesse o Diagnóstico Financeiro (link acima). 2. Se tiver dívidas com juros, liste-as por ordem de maior juros. 3. Decida quanto vai destinar mensalmente para quitá-las. 4. Mesmo assim, comece a distribuir pequenos valores nas 6 categorias para criar o hábito.",
+          verse: "\"Quem toma dinheiro emprestado se torna escravo de quem o empresta\" - Provérbios 22:7"
         }
       ]
     },
@@ -98,7 +114,7 @@ const Ebook = () => {
       title: "Os Dez Princípios Bíblicos de Salomão",
       chapters: [
         {
-          id: 7,
+          id: 8,
           title: "Princípios 1 a 5",
           subtitle: "Sabedoria, Diligência e Propósito",
           content: [
@@ -112,7 +128,7 @@ const Ebook = () => {
           verse: "\"Os pensamentos dos diligentes conduzem à abundância\" - Provérbios 21:5"
         },
         {
-          id: 8,
+          id: 9,
           title: "Princípios 6 a 10",
           subtitle: "Dívidas, Poupança e Generosidade",
           content: [
@@ -126,7 +142,7 @@ const Ebook = () => {
           verse: "\"A pessoa generosa terá sempre mais\" - Provérbios 11:25"
         },
         {
-          id: 9,
+          id: 10,
           title: "Três Formas de Ganhar Dinheiro",
           subtitle: "Servir para Prosperar",
           content: [
@@ -144,7 +160,7 @@ const Ebook = () => {
       title: "Desenvolvimento Contínuo",
       chapters: [
         {
-          id: 10,
+          id: 11,
           title: "Aprendizado e Excelência",
           subtitle: "60 Minutos que Transformam",
           content: [
@@ -158,7 +174,7 @@ const Ebook = () => {
           verse: "\"A mente dos sábios é aberta ao conhecimento\" - Provérbios 18:15"
         },
         {
-          id: 11,
+          id: 12,
           title: "Como Gerenciar Seu Dinheiro",
           subtitle: "Passos Práticos",
           content: [
@@ -173,7 +189,7 @@ const Ebook = () => {
           verse: "\"O que administra bem sua casa herdará vida\" - Provérbios 11:29"
         },
         {
-          id: 12,
+          id: 13,
           title: "Expandindo Nosso Poder",
           subtitle: "Conclusão e Novos Começos",
           content: [
@@ -202,7 +218,6 @@ const Ebook = () => {
 
   return (
     <div className="max-w-7xl mx-auto" data-testid="ebook-page">
-      {/* Header */}
       <div className="text-center mb-12">
         <div className="inline-block mb-4 px-4 py-2 bg-amber-100 rounded-full">
           <BookOpen className="w-6 h-6 text-amber-700 inline mr-2" />
@@ -218,7 +233,6 @@ const Ebook = () => {
       </div>
 
       <div className="grid lg:grid-cols-3 gap-8">
-        {/* Sidebar - Table of Contents */}
         <div className="lg:col-span-1">
           <div className="bg-white rounded-xl p-6 shadow-lg sticky top-4">
             <h2 className="text-xl font-bold text-gray-900 mb-4">Índice</h2>
@@ -257,7 +271,6 @@ const Ebook = () => {
           </div>
         </div>
 
-        {/* Main Content */}
         <div className="lg:col-span-2">
           {selectedChapter ? (
             <div className="bg-white rounded-xl p-8 shadow-lg">
@@ -283,14 +296,12 @@ const Ebook = () => {
                 ))}
               </div>
 
-              {/* Verse */}
               <div className="my-8 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-100">
                 <p className="text-center text-gray-700 italic font-serif">
                   {ebookContent[selectedChapter.partIndex].chapters[selectedChapter.chapterIndex].verse}
                 </p>
               </div>
 
-              {/* Exercise */}
               <div className="p-6 bg-amber-50 rounded-lg border-l-4 border-amber-500">
                 <h3 className="font-bold text-gray-900 mb-2 flex items-center gap-2">
                   📝 Exercício Prático
@@ -300,7 +311,6 @@ const Ebook = () => {
                 </p>
               </div>
 
-              {/* Navigation */}
               <div className="flex justify-between mt-8 pt-6 border-t border-gray-200">
                 <button
                   onClick={() => {
