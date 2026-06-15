@@ -22,10 +22,8 @@ function AppContent() {
   const [carregando, setCarregando] = useState(true);
 
   useEffect(() => {
-    // ✅ LÊ DADOS DA URL (vindos do diagnóstico em outro domínio)
     const perfilURL = searchParams.get('perfil');
     const receita = searchParams.get('receita');
-
     if (perfilURL === 'endividado' && receita) {
       setPerfil({
         tipo: 'endividado',
@@ -39,13 +37,10 @@ function AppContent() {
         }
       });
     }
-
-    // ✅ Também verifica localStorage (para usuários que já fizeram Passo Zero)
     const passoZeroStatus = localStorage.getItem('passo_zero_concluido');
     if (passoZeroStatus === 'true') {
       setPassoZeroConcluido(true);
     }
-
     setCarregando(false);
   }, [searchParams]);
 
@@ -66,7 +61,6 @@ function AppContent() {
     );
   }
 
-  // Se endividado e não concluiu Passo Zero → mostra ele primeiro
   if (perfil?.tipo === 'endividado' && !passoZeroConcluido) {
     return (
       <PassoZero
@@ -76,29 +70,26 @@ function AppContent() {
     );
   }
 
-  // Rotas normais
   return (
     <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/" element={
-            <PrivateRoute>
-              <Layout />
-            </PrivateRoute>
-          }>
-            <Route index element={<Home />} />
-            <Route path="dashboard" element={<Dashboard />} />
-            <Route path="configuracoes" element={<Configuracoes />} />
-            <Route path="lancamentos" element={<Lancamentos />} />
-            <Route path="metas" element={<Metas />} />
-            <Route path="ebook" element={<Ebook />} />
-            <Route path="exemplos" element={<Exemplos />} />
-          </Route>
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </BrowserRouter>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/" element={
+          <PrivateRoute>
+            <Layout />
+          </PrivateRoute>
+        }>
+          <Route index element={<Home />} />
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="configuracoes" element={<Configuracoes />} />
+          <Route path="lancamentos" element={<Lancamentos />} />
+          <Route path="metas" element={<Metas />} />
+          <Route path="ebook" element={<Ebook />} />
+          <Route path="exemplos" element={<Exemplos />} />
+        </Route>
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
     </AuthProvider>
   );
 }
