@@ -2,7 +2,6 @@ import React, { createContext, useState, useContext, useEffect } from 'react';
 import axios from 'axios';
 
 const AuthContext = createContext(null);
-
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "https://metodo6caixas-api.onrender.com";
 const API = `${BACKEND_URL}/api`;
 
@@ -11,7 +10,6 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState(localStorage.getItem('token'));
 
-  // Configure axios defaults
   useEffect(() => {
     if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
@@ -34,37 +32,30 @@ export const AuthProvider = ({ children }) => {
   };
 
   const login = async (email, password) => {
-  try {
-    const params = new URLSearchParams();
-    params.append('username', email);
-    params.append('password', password);
+    try {
+      const params = new URLSearchParams();
+      params.append('username', email);
+      params.append('password', password);
+      const response = await axios.post(
+        `${API}/auth/login`,
+        params,
+        { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+      );
+      const { access_token } = response.data;
+      localStorage.setItem('token', access_token);
+      axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
+      setToken(access_token);
+      await fetchUser();
+      return { success: true };
+    } catch (error) {
+      console.error('Erro no login:', error);
+      return {
+        success: false,
+        error: error.response?.data?.detail || 'Erro ao fazer login'
+      };
+    }
+  };
 
-    const response = await axios.post(
-      `${API}/auth/login`,
-      params,
-      {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
-        }
-      }
-    );
-
-    const { access_token } = response.data;
-
-    localStorage.setItem('token', access_token);
-    setToken(access_token);
-    axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
-
-    await fetchUser();
-    return { success: true };
-  } catch (error) {
-    console.error('Erro no login:', error);
-    return {
-      success: false,
-      error: error.response?.data?.detail || 'Erro ao fazer login'
-    };
-  }
-};
   const register = async (email, password, full_name, company_name) => {
     try {
       const response = await axios.post(`${API}/auth/register`, {
@@ -73,20 +64,18 @@ export const AuthProvider = ({ children }) => {
         full_name,
         company_name
       });
-      
+
       const { access_token } = response.data;
-      
       localStorage.setItem('token', access_token);
-      setToken(access_token);
       axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
-      
+      setToken(access_token);
       await fetchUser();
       return { success: true };
     } catch (error) {
       console.error('Erro no registro:', error);
-      return { 
-        success: false, 
-        error: error.response?.data?.detail || 'Erro ao fazer registro' 
+      return {
+        success: false,
+        error: error.response?.data?.detail || 'Erro ao fazer registro'
       };
     }
   };
@@ -119,4 +108,3 @@ export const useAuth = () => {
 };
 
 export default AuthContext;
-// Trigger Vercel deploy
