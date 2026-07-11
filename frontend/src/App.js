@@ -71,33 +71,33 @@ function AppContent() {
   }
 
   return (
-    <AuthProvider>
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/" element={
-          <PrivateRoute>
-            <Layout />
-          </PrivateRoute>
-        }>
-          <Route index element={<Home />} />
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="configuracoes" element={<Configuracoes />} />
-          <Route path="lancamentos" element={<Lancamentos />} />
-          <Route path="metas" element={<Metas />} />
-          <Route path="ebook" element={<Ebook />} />
-          <Route path="exemplos" element={<Exemplos />} />
-        </Route>
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </AuthProvider>
+    <Routes>
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/" element={
+        <PrivateRoute>
+          <Layout />
+        </PrivateRoute>
+      }>
+        <Route index element={<Home />} />
+        <Route path="dashboard" element={<Dashboard />} />
+        <Route path="configuracoes" element={<Configuracoes />} />
+        <Route path="lancamentos" element={<Lancamentos />} />
+        <Route path="metas" element={<Metas />} />
+        <Route path="ebook" element={<Ebook />} />
+        <Route path="exemplos" element={<Exemplos />} />
+      </Route>
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   );
 }
 
 function App() {
   return (
     <BrowserRouter>
-      <AppContent />
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
     </BrowserRouter>
   );
 }
