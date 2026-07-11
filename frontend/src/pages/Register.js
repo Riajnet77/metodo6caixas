@@ -46,8 +46,8 @@ const Register = () => {
     );
 
     if (result.success) {
-      navigate('/');
-    } else {
+    window.location.href = '/';
+   } else {
       setError(result.error);
       setLoading(false);
     }
