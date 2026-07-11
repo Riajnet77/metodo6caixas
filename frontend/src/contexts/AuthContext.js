@@ -57,28 +57,32 @@ export const AuthProvider = ({ children }) => {
   };
 
   const register = async (email, password, full_name, company_name) => {
-    try {
-      const response = await axios.post(`${API}/auth/register`, {
-        email,
-        password,
-        full_name,
-        company_name
-      });
+  try {
+    const response = await axios.post(`${API}/auth/register`, {
+      email,
+      password,
+      full_name,
+      company_name
+    });
 
-      const { access_token } = response.data;
-      localStorage.setItem('token', access_token);
-      axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
-      setToken(access_token);
-      await fetchUser();
-      return { success: true };
-    } catch (error) {
-      console.error('Erro no registro:', error);
-      return {
-        success: false,
-        error: error.response?.data?.detail || 'Erro ao fazer registro'
-      };
-    }
-  };
+    const { access_token } = response.data;
+    localStorage.setItem('token', access_token);
+    axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
+
+    // Busca dados do usuário diretamente sem fazer login separado
+    const userResponse = await axios.get(`${API}/auth/me`);
+    setUser(userResponse.data);
+    setLoading(false);
+
+    return { success: true };
+  } catch (error) {
+    console.error('Erro no registro:', error);
+    return {
+      success: false,
+      error: error.response?.data?.detail || 'Erro ao fazer registro'
+    };
+  }
+};
 
   const logout = () => {
     localStorage.removeItem('token');
