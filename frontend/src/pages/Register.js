@@ -42,16 +42,16 @@ const Register = () => {
       formData.email,
       formData.password,
       formData.full_name,
-      formData.full_name // usa o nome como company_name
+      formData.full_name
     );
-    
-   if (result.success) {
-  navigate('/');
-} else {
-  setError(result.error);
-  setLoading(false);
-}
-};
+
+    if (result.success) {
+      navigate('/');
+    } else {
+      setError(result.error);
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-amber-50 flex items-center justify-center p-4">
