@@ -27,7 +27,27 @@ client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
 # Create the main app without a prefix
-app = FastAPI()
+app = FastAPI(
+    docs_url=None,      # Desabilita /docs em produção
+    redoc_url=None,     # Desabilita /redoc em produção
+    openapi_url=None,   # Desabilita /openapi.json em produção
+)
+
+# Rate limiting por IP
+from collections import defaultdict
+import time
+
+rate_limit_store = defaultdict(list)
+
+def check_rate_limit(ip: str, max_requests: int = 10, window: int = 60) -> bool:
+    now = time.time()
+    requests = rate_limit_store[ip]
+    # Remove requests fora da janela
+    rate_limit_store[ip] = [r for r in requests if now - r < window]
+    if len(rate_limit_store[ip]) >= max_requests:
+        return False
+    rate_limit_store[ip].append(now)
+    return True
 
 # Create routers
 api_router = APIRouter(prefix="/api")
