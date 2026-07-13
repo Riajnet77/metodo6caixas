@@ -8,20 +8,32 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [bloqueado, setBloqueado] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (bloqueado) return;
     setError('');
     setLoading(true);
 
     const result = await login(email, password);
-    
+
     if (result.success) {
       navigate('/');
     } else {
-      setError(result.error);
+      if (result.error?.includes('Muitas tentativas')) {
+        setBloqueado(true);
+        setError(result.error);
+        // Desbloqueia após 1 minuto
+        setTimeout(() => {
+          setBloqueado(false);
+          setError('');
+        }, 60000);
+      } else {
+        setError(result.error);
+      }
       setLoading(false);
     }
   };
@@ -29,13 +41,11 @@ const Login = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-amber-50 flex items-center justify-center p-4">
       <div className="max-w-md w-full">
-        {/* Logo/Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2 font-serif">O Hábito da Economia</h1>
           <p className="text-gray-600">e Gestão Financeira</p>
         </div>
 
-        {/* Login Card */}
         <div className="bg-white rounded-xl shadow-lg p-8">
           <div className="flex items-center gap-2 mb-6">
             <LogIn className="w-6 h-6 text-amber-600" />
@@ -43,17 +53,15 @@ const Login = () => {
           </div>
 
           {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-2">
-              <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-              <p className="text-sm text-red-700">{error}</p>
+            <div className={`mb-6 p-4 rounded-lg flex items-start gap-2 ${bloqueado ? 'bg-orange-50 border border-orange-200' : 'bg-red-50 border border-red-200'}`}>
+              <AlertCircle className={`w-5 h-5 flex-shrink-0 mt-0.5 ${bloqueado ? 'text-orange-600' : 'text-red-600'}`} />
+              <p className={`text-sm ${bloqueado ? 'text-orange-700' : 'text-red-700'}`}>{error}</p>
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Email
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
@@ -63,15 +71,14 @@ const Login = () => {
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                   placeholder="seu@email.com"
                   required
+                  disabled={bloqueado}
                   data-testid="login-email-input"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Senha
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Senha</label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
@@ -81,6 +88,7 @@ const Login = () => {
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                   placeholder="••••••••"
                   required
+                  disabled={bloqueado}
                   data-testid="login-password-input"
                 />
               </div>
@@ -88,11 +96,11 @@ const Login = () => {
 
             <button
               type="submit"
-              disabled={loading}
-              className="w-full py-3 bg-gradient-to-r from-amber-500 to-yellow-500 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transform hover:-translate-y-0.5 transition-all"
+              disabled={loading || bloqueado}
+              className={`w-full py-3 text-white font-semibold rounded-lg shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transform hover:-translate-y-0.5 transition-all ${bloqueado ? 'bg-orange-400' : 'bg-gradient-to-r from-amber-500 to-yellow-500 hover:shadow-xl'}`}
               data-testid="login-submit-button"
             >
-              {loading ? 'Entrando...' : 'Entrar'}
+              {bloqueado ? '⏳ Aguarde 1 minuto...' : loading ? 'Entrando...' : 'Entrar'}
             </button>
           </form>
 
@@ -106,7 +114,6 @@ const Login = () => {
           </div>
         </div>
 
-        {/* Quote */}
         <div className="mt-8 text-center">
           <p className="text-sm text-gray-600 italic">
             "Os pensamentos dos diligentes conduzem à abundância"
