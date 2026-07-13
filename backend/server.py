@@ -699,14 +699,17 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
             ip = request.headers.get("X-Forwarded-For", request.client.host if request.client else "unknown")
             ip = ip.split(",")[0].strip()
             if not check_rate_limit(ip, max_requests=5, window=60):
-                return JSONResponse(
+                origin = request.headers.get("origin", "*")
+                return Response(
+                    content='{"detail": "Muitas tentativas. Aguarde 1 minuto e tente novamente."}',
                     status_code=429,
-                    content={"detail": "Muitas tentativas. Aguarde 1 minuto e tente novamente."},
+                    media_type="application/json",
                     headers={
-                        "Access-Control-Allow-Origin": request.headers.get("origin", "*"),
+                        "Access-Control-Allow-Origin": origin,
                         "Access-Control-Allow-Credentials": "true",
-                        "Content-Type": "application/json",
-        } 
+                        "Access-Control-Allow-Methods": "*",
+                        "Access-Control-Allow-Headers": "*",
+        }
     )
 
         response = await call_next(request)
