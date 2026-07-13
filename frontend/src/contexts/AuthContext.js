@@ -117,10 +117,11 @@ export const AuthProvider = ({ children }) => {
       return { success: true };
     } catch (error) {
       console.error('Erro no registro:', error);
-      if (error.response?.status === 429) {
-        return { success: false, error: 'Muitas tentativas. Aguarde 1 minuto e tente novamente.' };
-      }
-      return { success: false, error: error.response?.data?.detail || 'Erro ao fazer registro' };
+     const detail = error.response?.data?.detail;
+     if (error.response?.status === 429 || detail?.includes('Muitas')) {
+     return { success: false, error: 'Muitas tentativas. Aguarde 1 minuto e tente novamente.' };
+    }
+     return { success: false, error: detail || 'Erro ao fazer login' };
     }
   };
 
