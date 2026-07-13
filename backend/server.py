@@ -696,7 +696,8 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         # Rate limiting nas rotas de auth
         if request.url.path in ["/api/auth/login", "/api/auth/register"]:
-            ip = request.client.host
+            ip = request.headers.get("X-Forwarded-For", request.client.host if request.client else "unknown")
+            ip = ip.split(",")[0].strip()
             if not check_rate_limit(ip, max_requests=5, window=60):
                 return JSONResponse(
                     status_code=429,
