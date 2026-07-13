@@ -688,6 +688,36 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.requests import Request
+from starlette.responses import Response, JSONResponse
+
+class SecurityHeadersMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        # Rate limiting nas rotas de auth
+        if request.url.path in ["/api/auth/login", "/api/auth/register"]:
+            ip = request.client.host
+            if not check_rate_limit(ip, max_requests=5, window=60):
+                return JSONResponse(
+                    status_code=429,
+                    content={"detail": "Muitas tentativas. Aguarde 1 minuto e tente novamente."}
+                )
+
+        response = await call_next(request)
+
+        # Headers de segurança
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["X-XSS-Protection"] = "1; mode=block"
+        response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+        response.headers["Permissions-Policy"] = "geolocation=(), microphone=(), camera=()"
+        response.headers["Cache-Control"] = "no-store"
+
+        return response
+
+app.add_middleware(SecurityHeadersMiddleware)
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
