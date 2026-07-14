@@ -37,17 +37,19 @@ app = FastAPI(
 from collections import defaultdict
 import time
 
-rate_limit_store = defaultdict(list)
+from threading import Lock
 
-def check_rate_limit(ip: str, max_requests: int = 10, window: int = 60) -> bool:
+rate_limit_store = defaultdict(list)
+rate_limit_lock = Lock()
+
+def check_rate_limit(ip: str, max_requests: int = 5, window: int = 60) -> bool:
     now = time.time()
-    requests = rate_limit_store[ip]
-    # Remove requests fora da janela
-    rate_limit_store[ip] = [r for r in requests if now - r < window]
-    if len(rate_limit_store[ip]) >= max_requests:
-        return False
-    rate_limit_store[ip].append(now)
-    return True
+    with rate_limit_lock:
+        rate_limit_store[ip] = [r for r in rate_limit_store[ip] if now - r < window]
+        if len(rate_limit_store[ip]) >= max_requests:
+            return False
+        rate_limit_store[ip].append(now)
+        return True
 
 # Create routers
 api_router = APIRouter(prefix="/api")
