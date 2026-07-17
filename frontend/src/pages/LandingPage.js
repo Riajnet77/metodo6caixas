@@ -42,7 +42,7 @@ const LandingPage = () => {
         <p style={{ color: '#a3a3a3', maxWidth: 520, margin: '0 auto 32px', fontSize: 16, lineHeight: 1.7 }}>
           Faça o diagnóstico gratuito e veja em minutos qual é a sua situação real — quanto tempo seu dinheiro dura, onde ele some e qual o caminho certo.
         </p>
-        <a href="https://diagnostico--financeiro.vercel.app" target="_blank" rel="noreferrer" style={{ display: 'inline-block', background: 'transparent', color: '#f59e0b', fontSize: 16, fontWeight: 700, padding: '16px 40px', borderRadius: 12, textDecoration: 'none', border: '2px solid #f59e0b' }}>
+        <a href="https://diagnostico-financeiro-iota.vercel.app" target="_blank" rel="noreferrer" style={{ display: 'inline-block', background: 'transparent', color: '#f59e0b', fontSize: 16, fontWeight: 700, padding: '16px 40px', borderRadius: 12, textDecoration: 'none', border: '2px solid #f59e0b' }}>
           Fazer meu diagnóstico gratuito →
         </a>
         <p style={{ marginTop: 14, fontSize: 13, color: '#525252' }}>Leva menos de 3 minutos • 100% gratuito • Sem cadastro</p>
