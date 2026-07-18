@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { UserPlus, Mail, Lock, User, AlertCircle, ShieldOff } from 'lucide-react';
-// Token secreto de acesso — mudar após configurar Hotmart
+
 const TOKEN_ACESSO = 'metodo6caixas2026';
 
 const Register = () => {
@@ -28,7 +28,6 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-
     if (formData.password !== formData.confirmPassword) {
       setError('As senhas não coincidem');
       return;
@@ -37,7 +36,6 @@ const Register = () => {
       setError('A senha deve ter no mínimo 6 caracteres');
       return;
     }
-
     setLoading(true);
     const result = await register(
       formData.email,
@@ -45,7 +43,6 @@ const Register = () => {
       formData.full_name,
       formData.full_name
     );
-
     if (result.success) {
       window.location.href = '/';
     } else {
@@ -54,7 +51,6 @@ const Register = () => {
     }
   };
 
-  // Acesso bloqueado sem token válido
   if (!tokenValido) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-amber-50 flex items-center justify-center p-4">
@@ -67,7 +63,7 @@ const Register = () => {
             </p>
             
               href="LINK_HOTMART_AQUI"
-              className="inline-block w-full py-3 bg-gradient-to-r from-amber-500 to-yellow-500 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl mb-4"
+              className="inline-block w-full py-3 bg-gradient-to-r from-amber-500 to-yellow-500 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl mb-4 text-center"
             >
               Adquirir o Método 6 Caixas
             </a>
@@ -143,7 +139,7 @@ const Register = () => {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Senha</label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray.400" />
                 <input
                   type="password"
                   name="password"
