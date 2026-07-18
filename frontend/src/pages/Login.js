@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { LogIn, Mail, Lock, AlertCircle } from 'lucide-react';
 
 const Login = () => {
@@ -26,7 +26,6 @@ const Login = () => {
       if (result.error?.includes('Muitas tentativas')) {
         setBloqueado(true);
         setError(result.error);
-        // Desbloqueia após 1 minuto
         setTimeout(() => {
           setBloqueado(false);
           setError('');
@@ -105,11 +104,11 @@ const Login = () => {
           </form>
 
           <div className="mt-6 text-center">
-            <p className="text-gray-600 text-sm">
-              Não tem uma conta?{' '}
-              <Link to="/register" className="text-amber-600 font-semibold hover:text-amber-700">
-                Cadastre-se
-              </Link>
+            <p className="text-gray-500 text-xs">
+              Ainda não tem acesso?{' '}
+              <a href="LINK_HOTMART_AQUI" className="text-amber-600 font-semibold hover:text-amber-700">
+                Adquira o Método 6 Caixas
+              </a>
             </p>
           </div>
         </div>
