@@ -60,7 +60,7 @@ const Register = () => {
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-amber-50 flex items-center justify-center p-4">
         <div className="max-w-md w-full text-center">
           <div className="bg-white rounded-xl shadow-lg p-8">
-            <ShieldX className="w-16 h-16 text-red-400 mx-auto mb-4" />
+            <ShieldOff className="w-16 h-16 text-red-400 mx-auto mb-4" />
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Acesso Restrito</h2>
             <p className="text-gray-600 mb-6">
               O cadastro está disponível apenas para quem adquiriu o Método 6 Caixas.
