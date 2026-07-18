@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { UserPlus, Mail, Lock, User, AlertCircle, ShieldX } from 'lucide-react';
-
+import { UserPlus, Mail, Lock, User, AlertCircle, ShieldOff } from 'lucide-react';
 // Token secreto de acesso — mudar após configurar Hotmart
 const TOKEN_ACESSO = 'metodo6caixas2026';
 
