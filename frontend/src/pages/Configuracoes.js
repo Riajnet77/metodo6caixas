@@ -9,38 +9,38 @@ const CATEGORY_INFO = {
   'Viver': {
     emoji: '🏠',
     cor: 'blue',
-    explicacao: 'Tudo que você precisa para viver: aluguel, alimentação, transporte, contas de água, luz, internet, plano de saúde.',
-    dica: 'Se seus gastos de sobrevivência passam de 50%, você está vivendo acima das suas posses. Hora de revisar!'
+    explicacao: 'Tudo que você precisa para viver: aluguel/financiamento, alimentação, mercado, transporte, contas de água, luz, gás, internet, celular, plano de saúde, academia, medicamentos, farmácia, diarista, pet (ração, vet, banho), escola, creche, uniforme e material escolar.',
+    dica: 'Se seus gastos de sobrevivência passam de 50%, você está vivendo acima das suas posses. Revise o que é necessidade real e o que é conforto excessivo.'
   },
   'Liberdade Financeira': {
     emoji: '📈',
     cor: 'green',
-    explicacao: 'Invista em você mesmo primeiro! Este dinheiro vai para investimentos, ações, fundos ou poupança com objetivo de multiplicar.',
-    dica: 'Nunca toque neste dinheiro. Ele trabalha por você enquanto você dorme.'
+    explicacao: 'Invista em você primeiro! Este dinheiro vai para: poupança, Tesouro Direto, CDB, fundos de investimento, ações, previdência privada, fundos imobiliários. O objetivo é fazer o dinheiro trabalhar por você.',
+    dica: 'Nunca toque neste dinheiro para gastos pessoais. Ele trabalha por você enquanto você dorme. Comece com qualquer valor — o hábito importa mais que o montante.'
   },
   'Longo Prazo': {
     emoji: '🎯',
     cor: 'purple',
-    explicacao: 'Reserva para sonhos grandes: comprar um imóvel, trocar o carro, fazer uma reforma, viajar nas férias.',
-    dica: 'Diferente de investimento — este dinheiro será gasto, mas em algo planejado e importante.'
+    explicacao: 'Reserva para sonhos grandes e previsíveis: entrada do imóvel próprio, troca de veículo, reforma da casa, viagem dos sonhos, festa de formatura, casamento, aposentadoria antecipada.',
+    dica: 'Diferente de investimento — este dinheiro SERÁ gasto, mas em algo planejado e importante. Defina o sonho, calcule o valor e o prazo.'
   },
   'Educação': {
     emoji: '📚',
     cor: 'amber',
-    explicacao: 'Invista no seu crescimento: cursos, livros, workshops, treinamentos. Conhecimento é o único ativo que ninguém pode tirar de você.',
-    dica: 'Quem investe em educação tende a ganhar mais. Este é o melhor ROI que existe.'
+    explicacao: 'Invista no seu crescimento: cursos online, pós-graduação, MBA, idiomas (inglês, espanhol), certificações profissionais, livros, workshops, treinamentos, mentorias, congressos e eventos da sua área.',
+    dica: 'Conhecimento é o único ativo que ninguém pode tirar de você. Quem investe em educação tende a ganhar mais. Este é o melhor ROI que existe.'
   },
   'Doação': {
     emoji: '❤️',
     cor: 'rose',
-    explicacao: 'Dízimo, ofertas, projetos sociais, ajudar família ou amigos em necessidade.',
-    dica: 'É dando que se recebe. Quem é generoso atrai abundância — lei universal e bíblica.'
+    explicacao: 'Dízimo, ofertas para igrejas, doações para projetos sociais, ONGs, ajudar família ou amigos em necessidade, cestas básicas, contribuições para causas que você acredita.',
+    dica: 'É dando que se recebe. Quem é generoso atrai abundância — lei universal e bíblica. Se estiver endividado, priorize quitar as dívidas antes de retomar as doações.'
   },
   'Lazer': {
     emoji: '🎉',
     cor: 'cyan',
-    explicacao: 'Gaste COM VOCÊ sem culpa! Restaurantes, cinema, roupas, hobbies, viagens curtas.',
-    dica: 'Este dinheiro é para aproveitar. Gastar aqui não é errado — é necessário para manter equilíbrio!'
+    explicacao: 'Gaste COM VOCÊ sem culpa! Restaurantes, delivery, cinema, teatro, shows, streaming (Netflix, Spotify, Disney+), roupas e calçados, salão de beleza, barbearia, hobbies, viagens curtas, games, esportes recreativos.',
+    dica: 'Este dinheiro é para aproveitar a vida! Gastar aqui não é errado — é necessário para manter o equilíbrio e a saúde mental. Viva o presente com consciência.'
   },
 };
 
