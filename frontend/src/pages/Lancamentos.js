@@ -5,6 +5,43 @@ import { Plus, Edit2, Trash2, Save, X } from 'lucide-react';
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
+const SUBCATEGORIAS = {
+  'Viver': [
+    'Aluguel', 'Financiamento', 'Condomínio', 'Mercado', 'Feira',
+    'Luz', 'Água', 'Gás', 'Internet', 'Celular', 'Plano de saúde',
+    'Academia', 'Medicamentos', 'Farmácia', 'Consulta médica',
+    'Escola', 'Faculdade', 'Creche', 'Material escolar',
+    'Diarista', 'Pet - Ração', 'Pet - Veterinário', 'Pet - Banho',
+    'Transporte', 'Combustível', 'Uber', 'Ônibus', 'Metrô',
+    'Estacionamento', 'Pedágio', 'IPTU', 'IPVA', 'Seguro do carro',
+  ],
+  'Liberdade Financeira': [
+    'Poupança', 'Tesouro Direto', 'CDB', 'Fundo de investimento',
+    'Ações', 'FII - Fundo Imobiliário', 'Previdência privada',
+    'Criptomoedas', 'LCI', 'LCA', 'Debentures',
+  ],
+  'Longo Prazo': [
+    'Entrada do imóvel', 'Reforma', 'Troca de veículo',
+    'Viagem dos sonhos', 'Casamento', 'Festa de formatura',
+    'Aposentadoria antecipada', 'Reserva de emergência',
+  ],
+  'Educação': [
+    'Curso online', 'Pós-graduação', 'MBA', 'Inglês', 'Espanhol',
+    'Certificação profissional', 'Livros', 'Workshop',
+    'Mentoria', 'Congresso', 'Evento profissional',
+  ],
+  'Doação': [
+    'Dízimo', 'Oferta', 'ONG', 'Projeto social',
+    'Ajuda à família', 'Cesta básica', 'Doação para amigos',
+  ],
+  'Lazer': [
+    'Restaurante', 'Delivery', 'Cinema', 'Teatro', 'Show',
+    'Netflix', 'Spotify', 'Disney+', 'Amazon Prime',
+    'Roupas', 'Calçados', 'Salão de beleza', 'Barbearia',
+    'Viagem', 'Hospedagem', 'Hobby', 'Games', 'Esporte',
+  ],
+};
+
 const Lancamentos = () => {
   const [transactions, setTransactions] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -20,7 +57,6 @@ const Lancamentos = () => {
     return Number(localStorage.getItem('lastYear')) || new Date().getFullYear();
   });
 
-  // Ref para evitar que fetchSettings sobrescreva o mês/ano
   const filterMonthRef = useRef(filterMonth);
   const filterYearRef = useRef(filterYear);
 
@@ -47,25 +83,16 @@ const Lancamentos = () => {
     notes: ''
   });
 
-  useEffect(() => {
-    fetchCategories();
-  }, []);
-
-  useEffect(() => {
-    fetchTransactions();
-  }, [filterMonth, filterYear, filterCategory]);
+  useEffect(() => { fetchCategories(); }, []);
+  useEffect(() => { fetchTransactions(); }, [filterMonth, filterYear, filterCategory]);
 
   const fetchCategories = async () => {
     try {
       const response = await axios.get(`${API}/settings`);
       const cats = response.data.categories;
       setCategories(cats);
-      // Só seta categoria, não mexe na data
       if (cats.length > 0) {
-        setFormData(prev => ({
-          ...prev,
-          category: prev.category || cats[0].name
-        }));
+        setFormData(prev => ({ ...prev, category: prev.category || cats[0].name }));
       }
     } catch (error) {
       console.error('Erro ao buscar categorias:', error);
@@ -110,13 +137,11 @@ const Lancamentos = () => {
         date: new Date(formData.date + 'T12:00:00').toISOString(),
         amount: parseFloat(formData.amount)
       };
-
       if (editingId) {
         await axios.put(`${API}/transactions/${editingId}`, dataToSend);
       } else {
         await axios.post(`${API}/transactions`, dataToSend);
       }
-
       setEditingId(null);
       setShowForm(false);
       setFormData({
@@ -176,6 +201,7 @@ const Lancamentos = () => {
   ];
 
   const totalAmount = transactions.reduce((sum, t) => sum + t.amount, 0);
+  const subcategorias = SUBCATEGORIAS[formData.category] || [];
 
   return (
     <div className="max-w-6xl mx-auto" data-testid="lancamentos-page">
@@ -266,7 +292,7 @@ const Lancamentos = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Categoria</label>
                 <select
                   value={formData.category}
-                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                  onChange={(e) => setFormData({ ...formData, category: e.target.value, description: '' })}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                   required
                   data-testid="transaction-category-input"
@@ -277,6 +303,31 @@ const Lancamentos = () => {
                 </select>
               </div>
             </div>
+
+            {/* Sugestões de subcategoria */}
+            {subcategorias.length > 0 && (
+              <div>
+                <label className="block text-sm font-medium text-gray-500 mb-2">
+                  💡 Sugestões para <strong>{formData.category}</strong> — clique para preencher:
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  {subcategorias.map((sub, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => setFormData({ ...formData, description: sub })}
+                      className={`px-3 py-1 rounded-full text-xs font-semibold border transition-all ${
+                        formData.description === sub
+                          ? 'bg-amber-500 text-white border-amber-500'
+                          : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-amber-50 hover:border-amber-300 hover:text-amber-700'
+                      }`}
+                    >
+                      {sub}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <div className="grid md:grid-cols-2 gap-4">
               <div>
