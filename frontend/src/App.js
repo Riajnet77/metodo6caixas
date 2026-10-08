@@ -13,6 +13,7 @@ import Metas from './pages/Metas';
 import Ebook from './pages/Ebook';
 import Exemplos from './pages/Exemplos';
 import PassoZero from './pages/PassoZero';
+import Footer from './components/Footer'; // Importação do rodapé adicionada
 import './App.css';
 
 function AppContent() {
@@ -96,7 +97,12 @@ function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <AppContent />
+        <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+          <div style={{ flex: 1 }}>
+            <AppContent />
+          </div>
+          <Footer />
+        </div>
       </AuthProvider>
     </BrowserRouter>
   );
