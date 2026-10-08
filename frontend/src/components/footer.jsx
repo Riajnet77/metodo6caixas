@@ -18,8 +18,8 @@ export default function Footer() {
 
         {/* Dados do Produtor */}
         <div className="text-sm text-gray-600 space-y-1">
-          <p><strong>CNPJ/CPF:</strong> 00.000.000/0001-00 {/* Substitua pelo real */}</p>
-          <p><strong>Contato:</strong> suporte@metodo6caixas.com.br</p>
+          <p><strong>CNPJ/CPF:</strong> 185.800.842-53 {/* Substitua pelo real */}</p>
+          <p><strong>Contato:</strong> metodo6caixas@gmail.com</p>
         </div>
 
         {/* Aviso de Isenção (Exigido pela Hotmart para métodos) */}
