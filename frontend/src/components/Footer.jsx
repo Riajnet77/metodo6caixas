@@ -9,8 +9,8 @@ export default function Footer() {
         <a href="/termos-uso.html" style={{ color: '#aaa', textDecoration: 'none', margin: '0 10px' }}>Termos de Uso</a>
       </div>
       <div style={{ marginBottom: '10px' }}>
-        <p style={{ margin: '5px 0' }}>CNPJ/CPF: [185.800.842-53]</p>
-        <p style={{ margin: '5px 0' }}>Contato: [metodo6caixas@gmail.com]</p>
+        <p style={{ margin: '5px 0' }}>CNPJ/CPF: 185.800.842-53</p>
+        <p style={{ margin: '5px 0' }}>Contato: metodo6caixas@gmail.com</p>
       </div>
       <p style={{ color: '#555', maxWidth: '600px', margin: '10px auto 0' }}>
         Aviso legal: Os resultados podem variar de acordo com o esforço e dedicação de cada aluno.
