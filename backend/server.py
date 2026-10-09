@@ -1,4 +1,5 @@
-# FORCAR_NOVA_LEITURA from fastapi import FastAPI, APIRouter, HTTPException, Depends
+# FORCAR_NOVA_LEITURA
+from fastapi import FastAPI, APIRouter, HTTPException, Depends
 from fastapi.security import OAuth2PasswordRequestForm
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
