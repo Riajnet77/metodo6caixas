@@ -8,7 +8,7 @@ const LandingPage = () => {
       {/* HEADER */}
       <header style={{ background: '#0f0f0f', padding: '16px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 100 }}>
         <div>
-          <span style={{ fontSize: 16, fontWeight: 800, color: '#ffffff' }}>O Hábito da Economia</span>
+          <span style={{ fontSize: 16, fontWeight: 800, color: '#ffffff' }}>Método 6 Caixas</span>
           <span style={{ fontSize: 12, color: '#f59e0b', marginLeft: 8 }}>Método 6 Caixas</span>
         </div>
         <Link to="/login" style={{ background: 'transparent', border: '1px solid #f59e0b', color: '#f59e0b', padding: '8px 20px', borderRadius: 8, fontSize: 13, fontWeight: 700, textDecoration: 'none' }}>
@@ -29,8 +29,8 @@ const LandingPage = () => {
         <p style={{ fontSize: 'clamp(16px, 2vw, 20px)', color: '#a3a3a3', maxWidth: 560, margin: '0 auto 40px', lineHeight: 1.7 }}>
           Um sistema simples e comprovado para dividir sua renda em 6 destinos — e finalmente saber para onde cada real vai.
         </p>
-        <a href="LINK_HOTMART_AQUI" style={{ display: 'inline-block', background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: '#000', fontSize: 18, fontWeight: 800, padding: '18px 48px', borderRadius: 12, textDecoration: 'none', boxShadow: '0 8px 32px rgba(245,158,11,0.4)' }}>
-          Quero organizar minhas finanças →
+        <a href={process.env.REACT_APP_CHECKOUT_URL || "/diagnostico"} style={{ display: 'inline-block', background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: '#000', fontSize: 18, fontWeight: 800, padding: '18px 48px', borderRadius: 12, textDecoration: 'none', boxShadow: '0 8px 32px rgba(245,158,11,0.4)' }}>
+          {process.env.REACT_APP_CHECKOUT_URL ? "Quero organizar minhas finanças →" : "Começar pelo diagnóstico gratuito →"}
         </a>
         <p style={{ marginTop: 16, fontSize: 14, color: '#525252' }}>R$ 97,00 — ou 10x de R$ 9,70 no cartão</p>
       </section>
@@ -42,7 +42,7 @@ const LandingPage = () => {
         <p style={{ color: '#a3a3a3', maxWidth: 520, margin: '0 auto 32px', fontSize: 16, lineHeight: 1.7 }}>
           Faça o diagnóstico gratuito e veja em minutos qual é a sua situação real — quanto tempo seu dinheiro dura, onde ele some e qual o caminho certo.
         </p>
-        <a href="https://diagnostico-financeiro-iota.vercel.app" target="_blank" rel="noreferrer" style={{ display: 'inline-block', background: 'transparent', color: '#f59e0b', fontSize: 16, fontWeight: 700, padding: '16px 40px', borderRadius: 12, textDecoration: 'none', border: '2px solid #f59e0b' }}>
+        <a href="/diagnostico" style={{ display: 'inline-block', background: 'transparent', color: '#f59e0b', fontSize: 16, fontWeight: 700, padding: '16px 40px', borderRadius: 12, textDecoration: 'none', border: '2px solid #f59e0b' }}>
           Fazer meu diagnóstico gratuito →
         </a>
         <p style={{ marginTop: 14, fontSize: 13, color: '#525252' }}>Leva menos de 3 minutos • 100% gratuito • Sem cadastro</p>
@@ -149,10 +149,10 @@ const LandingPage = () => {
               </li>
             ))}
           </ul>
-          <a href="LINK_HOTMART_AQUI" style={{ display: 'block', background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: '#000', fontSize: 18, fontWeight: 800, padding: '18px 32px', borderRadius: 12, textDecoration: 'none', marginBottom: 16 }}>
-            Quero começar agora →
+          <a href={process.env.REACT_APP_CHECKOUT_URL || "/diagnostico"} style={{ display: 'block', background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: '#000', fontSize: 18, fontWeight: 800, padding: '18px 32px', borderRadius: 12, textDecoration: 'none', marginBottom: 16 }}>
+            {process.env.REACT_APP_CHECKOUT_URL ? "Quero começar agora →" : "Fazer diagnóstico gratuito →"}
           </a>
-          <p style={{ fontSize: 13, color: '#525252' }}>🔒 Pagamento 100% seguro via Hotmart</p>
+          <p style={{ fontSize: 13, color: '#525252' }}>{process.env.REACT_APP_CHECKOUT_URL ? "🔒 Pagamento no checkout" : "Já tem acesso? Entre pelo botão no topo da página."}</p>
         </div>
       </section>
 
@@ -188,15 +188,15 @@ const LandingPage = () => {
         <p style={{ color: '#a3a3a3', maxWidth: 480, margin: '0 auto 40px', fontSize: 16 }}>
           "Todo resultado que você deseja na sua vida está naquilo que você ainda não aprendeu."
         </p>
-        <a href="LINK_HOTMART_AQUI" style={{ display: 'inline-block', background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: '#000', fontSize: 18, fontWeight: 800, padding: '18px 48px', borderRadius: 12, textDecoration: 'none', boxShadow: '0 8px 32px rgba(245,158,11,0.4)' }}>
-          Começar agora por R$ 97,00 →
+        <a href={process.env.REACT_APP_CHECKOUT_URL || "/diagnostico"} style={{ display: 'inline-block', background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: '#000', fontSize: 18, fontWeight: 800, padding: '18px 48px', borderRadius: 12, textDecoration: 'none', boxShadow: '0 8px 32px rgba(245,158,11,0.4)' }}>
+          {process.env.REACT_APP_CHECKOUT_URL ? "Começar agora por R$ 97,00 →" : "Fazer diagnóstico gratuito →"}
         </a>
         <p style={{ marginTop: 16, fontSize: 14, color: '#525252' }}>ou 10x de R$ 9,70 • Garantia de 7 dias • Acesso imediato</p>
       </section>
 
       {/* FOOTER */}
       <footer style={{ background: '#0f0f0f', borderTop: '1px solid #1a1a1a', padding: '32px 24px', textAlign: 'center', color: '#525252', fontSize: 13 }}>
-        <p>© 2026 O Hábito da Economia e Gestão Financeira — Método 6 Caixas</p>
+        <p>© 2026 Método 6 Caixas e Gestão Financeira — Método 6 Caixas</p>
         <p style={{ marginTop: 8 }}>Todos os direitos reservados</p>
       </footer>
 

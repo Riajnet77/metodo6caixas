@@ -680,6 +680,8 @@ async def get_example_data(profile_type: str):
         raise HTTPException(status_code=404, detail="Profile type not found. Use 'iniciante' or 'veterano'")
 
 # Include routers
+from backend.onboarding import create_onboarding_router
+app.include_router(create_onboarding_router(db))
 app.include_router(auth_router)
 app.include_router(api_router)
 

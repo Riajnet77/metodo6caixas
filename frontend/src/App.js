@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useSearchParams } from 'react-router-dom';
+import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import PrivateRoute from './components/PrivateRoute';
 import Layout from './components/Layout';
@@ -12,74 +12,20 @@ import Lancamentos from './pages/Lancamentos';
 import Metas from './pages/Metas';
 import Ebook from './pages/Ebook';
 import Exemplos from './pages/Exemplos';
-import PassoZero from './pages/PassoZero';
+import { MetodoProvider, MetodoGate } from './contexts/MetodoContext';
+import Diagnostico from './pages/Diagnostico';
+import EtapaZero from './pages/EtapaZero';
 import Footer from './components/Footer'; // Importação do rodapé adicionada
 import './App.css';
 
 function AppContent() {
-  const [searchParams] = useSearchParams();
-  const [perfil, setPerfil] = useState(null);
-  const [passoZeroConcluido, setPassoZeroConcluido] = useState(false);
-  const [carregando, setCarregando] = useState(true);
-
-  useEffect(() => {
-    const perfilURL = searchParams.get('perfil');
-    const receita = searchParams.get('receita');
-    if (perfilURL === 'endividado' && receita) {
-      setPerfil({
-        tipo: 'endividado',
-        dados: {
-          receita: Number(receita),
-          totalGastos: Number(searchParams.get('gastos') || 0),
-          totalFixos: Number(searchParams.get('fixos') || 0),
-          totalVariaveis: Number(searchParams.get('variaveis') || 0),
-          totalCartao: Number(searchParams.get('cartao') || 0),
-          deficitMensal: Number(searchParams.get('deficit') || 0),
-        }
-      });
-    }
-    const passoZeroStatus = localStorage.getItem('passo_zero_concluido');
-    if (passoZeroStatus === 'true') {
-      setPassoZeroConcluido(true);
-    }
-    setCarregando(false);
-  }, [searchParams]);
-
-  const handleConcluirPassoZero = () => {
-    localStorage.setItem('passo_zero_concluido', 'true');
-    setPassoZeroConcluido(true);
-    setPerfil(null);
-  };
-
-  if (carregando) {
-    return (
-      <div style={{
-        minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
-        background: '#0f0f0f', color: '#ffffff', fontSize: 14,
-      }}>
-        Carregando...
-      </div>
-    );
-  }
-
-  if (perfil?.tipo === 'endividado' && !passoZeroConcluido) {
-    return (
-      <PassoZero
-        dadosDoDiagnostico={perfil.dados}
-        onConcluirPassoZero={handleConcluirPassoZero}
-      />
-    );
-  }
-
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
-      <Route path="/" element={
-        <PrivateRoute>
-          <Layout />
-        </PrivateRoute>
-      }>
+      <Route path="/diagnostico" element={<Diagnostico />} />
+      <Route path="/passo-zero" element={<PrivateRoute><EtapaZero /></PrivateRoute>} />
+      <Route path="/" element={<PrivateRoute><MetodoGate><Layout /></MetodoGate></PrivateRoute>}>
         <Route index element={<Home />} />
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="configuracoes" element={<Configuracoes />} />
@@ -96,14 +42,14 @@ function AppContent() {
 function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>
+      <AuthProvider><MetodoProvider>
         <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
           <div style={{ flex: 1 }}>
             <AppContent />
           </div>
           <Footer />
         </div>
-      </AuthProvider>
+      </MetodoProvider></AuthProvider>
     </BrowserRouter>
   );
 }

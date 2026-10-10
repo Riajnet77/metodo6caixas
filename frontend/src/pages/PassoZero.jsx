@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { formatarMoeda } from '../logica.js'
 
 // ============================================================
@@ -283,9 +283,9 @@ function EtapaCongelamento({ dados, onProximo }) {
 
   const economiaEstimada = {
     cartaoCredito: dados.totalCartao * 0.3,  // Evita 30% do gasto no cartão
-    assinaturas: 150,  // Média de streaming + apps
+    assinaturas: (dados.variaveis?.assinaturas || 0),
     lazer: (dados.variaveis?.lazer || 0) * 0.5,
-    parcelas: 200,  // Média de novas parcelas
+    parcelas: 0,
     delivery: (dados.variaveis?.alimentacao || 0) * 0.2,  // 20% de economia em alimentação
   }
 
@@ -310,7 +310,7 @@ function EtapaCongelamento({ dados, onProximo }) {
     <div>
       <div style={styles.label}>Etapa 2 de 5</div>
       <h2 style={styles.title}>Congele novos gastos</h2>
-      <p style={styles.text}>Enquanto estiver no Passo Zero, estas são as regras não negociáveis:</p>
+      <p style={styles.text}>Escolha os ajustes possíveis. Os valores abaixo são simulações, não economias garantidas. Evitar novas parcelas não elimina pagamentos já contratados.</p>
 
       <div style={{marginTop:16}}>
         {itens.map(item => (
@@ -323,7 +323,7 @@ function EtapaCongelamento({ dados, onProximo }) {
               <div style={{fontSize:13,color:'#737373'}}>{item.desc}</div>
               {cortes[item.key] && (
                 <div style={{fontSize:12,color:'#f97316',fontWeight:700,marginTop:4}}>
-                  Economia: {formatarMoeda(item.economia)}/mês
+                  Economia estimada: {formatarMoeda(item.economia)}/mês
                 </div>
               )}
             </div>
@@ -670,9 +670,9 @@ export default function PassoZero({ dadosDoDiagnostico, onConcluirPassoZero }) {
     const dados = dadosDoDiagnostico || {}
     return {
       cartaoCredito: (dados.totalCartao || 0) * 0.3,
-      assinaturas: 150,
+      assinaturas: (dados.variaveis?.assinaturas || 0),
       lazer: ((dados.variaveis?.lazer || 0)) * 0.5,
-      parcelas: 200,
+      parcelas: 0,
       delivery: ((dados.variaveis?.alimentacao || 0)) * 0.2,
     }
   }
