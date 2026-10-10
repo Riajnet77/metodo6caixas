@@ -2,7 +2,7 @@ import React, { createContext, useState, useContext, useEffect, useCallback } fr
 import axios from 'axios';
 
 const AuthContext = createContext(null);
-   const BACKEND_URL = "https://metodo6caixas-xk21.vercel.app";
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
 // Tempo de expiração do token — 7 dias em ms
