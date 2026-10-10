@@ -6,6 +6,8 @@ import Layout from './components/Layout';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import PasswordRecovery from './pages/PasswordRecovery';
+import { AccessProvider } from './contexts/AccessContext';
 import Dashboard from './pages/Dashboard';
 import Configuracoes from './pages/Configuracoes';
 import Lancamentos from './pages/Lancamentos';
@@ -23,6 +25,8 @@ function AppContent() {
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/esqueci-senha" element={<PasswordRecovery />} />
+      <Route path="/redefinir-senha" element={<PasswordRecovery reset />} />
       <Route path="/diagnostico" element={<Diagnostico />} />
       <Route path="/passo-zero" element={<PrivateRoute><EtapaZero /></PrivateRoute>} />
       <Route path="/" element={<PrivateRoute><MetodoGate><Layout /></MetodoGate></PrivateRoute>}>
@@ -42,14 +46,14 @@ function AppContent() {
 function App() {
   return (
     <BrowserRouter>
-      <AuthProvider><MetodoProvider>
+      <AccessProvider><AuthProvider><MetodoProvider>
         <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
           <div style={{ flex: 1 }}>
             <AppContent />
           </div>
           <Footer />
         </div>
-      </MetodoProvider></AuthProvider>
+      </MetodoProvider></AuthProvider></AccessProvider>
     </BrowserRouter>
   );
 }

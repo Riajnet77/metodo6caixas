@@ -1,7 +1,9 @@
 import React from 'react';
+import { useAccess } from '../contexts/AccessContext';
 import { Link } from 'react-router-dom';
 
 const LandingPage = () => {
+  const {checkout_url} = useAccess();
   return (
     <div style={{ fontFamily: "'Inter', sans-serif", background: '#ffffff', color: '#0f0f0f' }}>
 
@@ -29,8 +31,8 @@ const LandingPage = () => {
         <p style={{ fontSize: 'clamp(16px, 2vw, 20px)', color: '#a3a3a3', maxWidth: 560, margin: '0 auto 40px', lineHeight: 1.7 }}>
           Um sistema simples e comprovado para dividir sua renda em 6 destinos — e finalmente saber para onde cada real vai.
         </p>
-        <a href={process.env.REACT_APP_CHECKOUT_URL || "/diagnostico"} style={{ display: 'inline-block', background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: '#000', fontSize: 18, fontWeight: 800, padding: '18px 48px', borderRadius: 12, textDecoration: 'none', boxShadow: '0 8px 32px rgba(245,158,11,0.4)' }}>
-          {process.env.REACT_APP_CHECKOUT_URL ? "Quero organizar minhas finanças →" : "Começar pelo diagnóstico gratuito →"}
+        <a href={checkout_url || "/diagnostico"} style={{ display: 'inline-block', background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: '#000', fontSize: 18, fontWeight: 800, padding: '18px 48px', borderRadius: 12, textDecoration: 'none', boxShadow: '0 8px 32px rgba(245,158,11,0.4)' }}>
+          {checkout_url ? "Quero organizar minhas finanças →" : "Começar pelo diagnóstico gratuito →"}
         </a>
         <p style={{ marginTop: 16, fontSize: 14, color: '#525252' }}>R$ 97,00 — ou 10x de R$ 9,70 no cartão</p>
       </section>
@@ -149,10 +151,10 @@ const LandingPage = () => {
               </li>
             ))}
           </ul>
-          <a href={process.env.REACT_APP_CHECKOUT_URL || "/diagnostico"} style={{ display: 'block', background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: '#000', fontSize: 18, fontWeight: 800, padding: '18px 32px', borderRadius: 12, textDecoration: 'none', marginBottom: 16 }}>
-            {process.env.REACT_APP_CHECKOUT_URL ? "Quero começar agora →" : "Fazer diagnóstico gratuito →"}
+          <a href={checkout_url || "/diagnostico"} style={{ display: 'block', background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: '#000', fontSize: 18, fontWeight: 800, padding: '18px 32px', borderRadius: 12, textDecoration: 'none', marginBottom: 16 }}>
+            {checkout_url ? "Quero começar agora →" : "Fazer diagnóstico gratuito →"}
           </a>
-          <p style={{ fontSize: 13, color: '#525252' }}>{process.env.REACT_APP_CHECKOUT_URL ? "🔒 Pagamento no checkout" : "Já tem acesso? Entre pelo botão no topo da página."}</p>
+          <p style={{ fontSize: 13, color: '#525252' }}>{checkout_url ? "🔒 Pagamento no checkout" : "Já tem acesso? Entre pelo botão no topo da página."}</p>
         </div>
       </section>
 
@@ -188,8 +190,8 @@ const LandingPage = () => {
         <p style={{ color: '#a3a3a3', maxWidth: 480, margin: '0 auto 40px', fontSize: 16 }}>
           "Todo resultado que você deseja na sua vida está naquilo que você ainda não aprendeu."
         </p>
-        <a href={process.env.REACT_APP_CHECKOUT_URL || "/diagnostico"} style={{ display: 'inline-block', background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: '#000', fontSize: 18, fontWeight: 800, padding: '18px 48px', borderRadius: 12, textDecoration: 'none', boxShadow: '0 8px 32px rgba(245,158,11,0.4)' }}>
-          {process.env.REACT_APP_CHECKOUT_URL ? "Começar agora por R$ 97,00 →" : "Fazer diagnóstico gratuito →"}
+        <a href={checkout_url || "/diagnostico"} style={{ display: 'inline-block', background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: '#000', fontSize: 18, fontWeight: 800, padding: '18px 48px', borderRadius: 12, textDecoration: 'none', boxShadow: '0 8px 32px rgba(245,158,11,0.4)' }}>
+          {checkout_url ? "Começar agora por R$ 97,00 →" : "Fazer diagnóstico gratuito →"}
         </a>
         <p style={{ marginTop: 16, fontSize: 14, color: '#525252' }}>ou 10x de R$ 9,70 • Garantia de 7 dias • Acesso imediato</p>
       </section>

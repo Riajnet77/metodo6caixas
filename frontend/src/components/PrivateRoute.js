@@ -2,9 +2,10 @@ import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import LandingPage from '../pages/LandingPage';
+import { SupportLink } from '../contexts/AccessContext';
 
 const PrivateRoute = ({ children }) => {
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, loading, sessionError, retrySession, logout } = useAuth();
 
   if (loading) {
     return (
@@ -16,6 +17,8 @@ const PrivateRoute = ({ children }) => {
       </div>
     );
   }
+
+  if(sessionError) return <div className="p-8 text-center"><p role="alert">{sessionError}</p><button className="underline m-3" onClick={retrySession}>Tentar novamente</button><button className="underline m-3" onClick={logout}>Voltar ao início</button><SupportLink /></div>;
 
   return isAuthenticated ? children : <LandingPage />;
 };
