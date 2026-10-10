@@ -4,6 +4,8 @@ from fastapi.security import OAuth2PasswordRequestForm
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from pymongo import AsyncMongoClient
+from pymongo.errors import PyMongoError
+from starlette.responses import JSONResponse
 import os
 import logging
 from pathlib import Path
@@ -16,7 +18,7 @@ from collections import defaultdict
 # Import authentication functions
 from backend.auth import (
     Token, TokenData, User, UserInDB, UserCreate, UserLogin,
-    verify_password, get_password_hash, create_access_token, get_current_user
+    verify_password, get_password_hash, create_access_token, get_current_user, configure_auth
 )
 
 ROOT_DIR = Path(__file__).parent
@@ -26,6 +28,8 @@ load_dotenv(ROOT_DIR / '.env')
 mongo_url = os.environ['MONGO_URL']
 client = AsyncMongoClient(mongo_url)
 db = client[os.environ['DB_NAME']]
+configure_auth(db)
+from backend.customer_access import create_customer_router, find_email_user, ensure_account_access
 
 # Create the main app without a prefix
 app = FastAPI(
@@ -221,51 +225,13 @@ async def get_or_create_settings(user_id: str, company_id: str, month: int, year
 
 @auth_router.post("/register", response_model=Token)
 async def register(user_data: UserCreate):
-    """Register a new user"""
-    # Check if user already exists
-    existing_user = await db.users.find_one({"email": user_data.email})
-    if existing_user:
-        raise HTTPException(
-            status_code=400,
-            detail="Email já cadastrado"
-        )
-    
-    # Create company_id from company name
-    company_id = str(uuid.uuid4())
-    
-    # Create user
-    user = UserInDB(
-        id=str(uuid.uuid4()),
-        email=user_data.email,
-        full_name=user_data.full_name,
-        company_id=company_id,
-        company_name=user_data.company_name,
-        hashed_password=get_password_hash(user_data.password[:72]),
-        is_active=True,
-        created_at=datetime.now(timezone.utc)
-    )
-    
-    # Save to database
-    user_dict = user.model_dump()
-    user_dict['created_at'] = user_dict['created_at'].isoformat()
-    await db.users.insert_one(user_dict)
-    
-    # Create access token
-    access_token = create_access_token(
-        data={
-            "sub": user.id,
-            "email": user.email,
-            "company_id": user.company_id
-        }
-    )
-    
-    return Token(access_token=access_token, token_type="bearer")
+    raise HTTPException(403, "O cadastro é liberado após a confirmação da compra. Use o link enviado ao email do comprador.")
 
 @auth_router.post("/login", response_model=Token)
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     """Login user"""
     # Find user
-    user_doc = await db.users.find_one({"email": form_data.username})
+    user_doc = await find_email_user(db, form_data.username)
     if not user_doc:
         raise HTTPException(
             status_code=401,
@@ -279,18 +245,21 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     user = UserInDB(**user_doc)
     
     # Verify password
-    if not verify_password(form_data.password, user.hashed_password):
+    if not user_doc.get("has_password", True) or not verify_password(form_data.password, user.hashed_password):
         raise HTTPException(
             status_code=401,
             detail="Email ou senha incorretos"
         )
     
+    await ensure_account_access(db, user_doc)
+
     # Create access token
     access_token = create_access_token(
         data={
             "sub": user.id,
             "email": user.email,
-            "company_id": user.company_id
+            "company_id": user.company_id,
+            "ver": user_doc.get("auth_version", 0)
         }
     )
     
@@ -682,6 +651,7 @@ async def get_example_data(profile_type: str):
 # Include routers
 from backend.onboarding import create_onboarding_router
 app.include_router(create_onboarding_router(db))
+app.include_router(create_customer_router(db))
 app.include_router(auth_router)
 app.include_router(api_router)
 
@@ -700,9 +670,10 @@ from starlette.responses import Response, JSONResponse
 class SecurityHeadersMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         # Rate limiting nas rotas de auth
-        if request.url.path in ["/api/auth/login", "/api/auth/register"]:
-            ip = request.headers.get("X-Forwarded-For", request.client.host if request.client else "unknown")
-            ip = ip.split(",")[0].strip()
+        if request.url.path in ["/api/auth/login", "/api/auth/register", "/api/auth/forgot-password", "/api/auth/reset-password"]:
+            # Uvicorn resolves client addresses from trusted proxies; do not trust
+            # a forwarded header supplied directly by an arbitrary caller.
+            ip = request.client.host if request.client else "unknown"
             if not check_rate_limit(ip, max_requests=5, window=60):
                 origin = request.headers.get("origin", "*")
                 return Response(
@@ -742,3 +713,18 @@ logger = logging.getLogger(__name__)
 @app.on_event("shutdown")
 async def shutdown_db_client():
     await client.close()
+
+
+@app.on_event("startup")
+async def create_recovery_expiry_index():
+    try:
+        await db.password_reset_tokens.create_index("expires_at", expireAfterSeconds=0)
+    except Exception:
+        # Link expiry is enforced on every reset even if TTL cleanup is unavailable.
+        logger.warning("Could not configure automatic recovery-token cleanup")
+
+
+@app.exception_handler(PyMongoError)
+async def database_unavailable(request, exc):
+    logger.error("Database operation unavailable (%s)", type(exc).__name__)
+    return JSONResponse(status_code=503, content={"detail": "O serviço está temporariamente indisponível. Aguarde um minuto e tente novamente."})

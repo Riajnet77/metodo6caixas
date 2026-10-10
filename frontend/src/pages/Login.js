@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import { useAccess, SupportLink } from '../contexts/AccessContext';
 import { LogIn, Mail, Lock, AlertCircle } from 'lucide-react';
 
 const Login = () => {
@@ -11,6 +12,7 @@ const Login = () => {
   const [bloqueado, setBloqueado] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
+  const {checkout_url} = useAccess();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -41,7 +43,7 @@ const Login = () => {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-amber-50 flex items-center justify-center p-4">
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2 font-serif">O Hábito da Economia</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2 font-serif">Método 6 Caixas</h1>
           <p className="text-gray-600">e Gestão Financeira</p>
         </div>
 
@@ -70,7 +72,7 @@ const Login = () => {
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                   placeholder="seu@email.com"
                   required
-                  disabled={bloqueado}
+                  disabled={bloqueado || loading}
                   data-testid="login-email-input"
                 />
               </div>
@@ -87,7 +89,7 @@ const Login = () => {
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                   placeholder="••••••••"
                   required
-                  disabled={bloqueado}
+                  disabled={bloqueado || loading}
                   data-testid="login-password-input"
                 />
               </div>
@@ -99,15 +101,18 @@ const Login = () => {
               className={`w-full py-3 text-white font-semibold rounded-lg shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transform hover:-translate-y-0.5 transition-all ${bloqueado ? 'bg-orange-400' : 'bg-gradient-to-r from-amber-500 to-yellow-500 hover:shadow-xl'}`}
               data-testid="login-submit-button"
             >
-              {bloqueado ? '⏳ Aguarde 1 minuto...' : loading ? 'Entrando...' : 'Entrar'}
+              {bloqueado ? '⏳ Aguarde 1 minuto...' : loading ? 'Entrando... aguarde' : 'Entrar'}
             </button>
           </form>
+          <Link className="block text-sm text-amber-700 underline mt-4" to="/esqueci-senha">Esqueci minha senha</Link>
+          <Link className="block text-sm text-amber-700 underline mt-3" to="/register">Comprei e preciso do primeiro acesso</Link>
+          <SupportLink />
 
           <div className="mt-6 text-center">
             <p className="text-gray-500 text-xs">
               Ainda não tem acesso?{' '}
-              <a href="LINK_HOTMART_AQUI" className="text-amber-600 font-semibold hover:text-amber-700">
-                Adquira o Método 6 Caixas
+              <a href={checkout_url || "/diagnostico"} className="text-amber-600 font-semibold hover:text-amber-700">
+                {checkout_url ? "Adquira o Método 6 Caixas" : "Conheça o diagnóstico gratuito"}
               </a>
             </p>
           </div>
