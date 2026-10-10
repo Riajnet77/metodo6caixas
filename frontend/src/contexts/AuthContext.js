@@ -86,6 +86,9 @@ export const AuthProvider = ({ children }) => {
       );
       const { access_token } = response.data;
       saveToken(access_token);
+      const current = await axios.get(`${API}/auth/me`);
+      setUser(current.data);
+      setLoading(false);
       return { success: true };
     } catch (error) {
       console.error('Erro no login:', error);

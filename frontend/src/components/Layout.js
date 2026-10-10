@@ -31,7 +31,8 @@ const Layout = () => {
     { name: 'Configurações', href: '/configuracoes', icon: Settings },
     { name: 'Lançamentos', href: '/lancamentos', icon: PlusCircle },
     { name: 'Metas', href: '/metas', icon: Target },
-    { name: 'Ebook', href: '/ebook', icon: BookOpen },
+    { name: 'Meu diagnóstico', href: '/diagnostico', icon: BookOpen },
+    { name: 'Ebook de apoio', href: '/ebook', icon: BookOpen },
     { name: 'Exemplos', href: '/exemplos', icon: Users },
   ];
 
@@ -55,7 +56,7 @@ const Layout = () => {
           <div className="p-6 border-b border-gray-200">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-xl font-bold text-gray-800 font-serif">O Hábito da Economia</h1>
+                <h1 className="text-xl font-bold text-gray-800 font-serif">Método 6 Caixas</h1>
                 <p className="text-xs text-amber-600 font-semibold">e Gestão Financeira</p>
               </div>
               <button 
@@ -133,7 +134,7 @@ const Layout = () => {
             <button onClick={() => setSidebarOpen(true)}>
               <Menu className="w-6 h-6" />
             </button>
-            <h2 className="text-lg font-bold text-gray-800">Hábito da Economia</h2>
+            <h2 className="text-lg font-bold text-gray-800">Método 6 Caixas</h2>
             <div className="w-6" />
           </div>
         </header>
