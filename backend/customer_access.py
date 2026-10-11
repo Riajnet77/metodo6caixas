@@ -72,6 +72,7 @@ async def send_customer_email(email, subject, text, key):
     def deliver():
         req = urllib.request.Request("https://api.resend.com/emails", data=body, method="POST", headers={
             "Authorization": "Bearer " + os.environ["RESEND_API_KEY"],
+            "User-Agent": "Metodo6Caixas/1.0",
             "Content-Type": "application/json", "Idempotency-Key": key,
         })
         with urllib.request.urlopen(req, timeout=15) as response:
