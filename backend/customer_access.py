@@ -13,6 +13,7 @@ import os
 import re
 import secrets
 import urllib.request
+import urllib.error
 from urllib.parse import urlparse
 import uuid
 
@@ -79,9 +80,12 @@ async def send_customer_email(email, subject, text, key):
                 raise ValueError("Email provider did not accept message")
     try:
         await asyncio.to_thread(deliver)
-    except Exception:
+    except urllib.error.HTTPError as exc:
+        logger.error("Transactional email delivery failed: HTTP %s", exc.code)
+        raise HTTPException(503, "Não foi possível enviar o email agora. Tente novamente ou fale com o suporte.") from None
+    except Exception as exc:
         # Do not log URLs, reset tokens, email contents, credentials or provider responses.
-        logger.error("Transactional email delivery failed")
+        logger.error("Transactional email delivery failed: %s", type(exc).__name__)
         raise HTTPException(503, "Não foi possível enviar o email agora. Tente novamente ou fale com o suporte.") from None
 
 
