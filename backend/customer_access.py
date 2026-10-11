@@ -307,6 +307,11 @@ def create_customer_router(db, send_email=send_customer_email):
             raise HTTPException(422, "Notificação de compra inválida") from None
         if event.version != "2.0.0":
             raise HTTPException(422, "Configure o webhook na versão 2.0.0")
+        # Hotmart's authenticated configuration test uses a synthetic product.
+        # Acknowledge it without touching accounts, purchases, or email delivery.
+        product = payload["data"]["product"]
+        if event.data.product.id == 0 and product.get("sku") == "HTM_SANDBOX":
+            return {"status": "test_received", "access_granted": False}
         if str(event.data.product.id) not in allowed:
             raise HTTPException(403, "Produto não autorizado")
         if event.data.subscription:

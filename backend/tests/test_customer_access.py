@@ -36,6 +36,23 @@ class CustomerAccessTests(unittest.TestCase):
     def webhook(self,event,headers=None):
         return self.client.post('/api/integrations/hotmart/webhook',json=event,headers=headers if headers is not None else {'X-HOTMART-HOTTOK':'test-hotmart-secret'})
     def token(self):return create_access_token({'sub':'old-user','email':'buyer@example.com','company_id':'company'})
+    def test_sandbox_acknowledged_without_side_effects_and_requires_auth(self):
+        ev=self.event(product=0)
+        ev['data']['product']['sku']='HTM_SANDBOX'
+        ev['data']['subscription']={'status':'ACTIVE'}
+        self.assertEqual(self.webhook(ev,{}).status_code,401)
+        for kind in ('PURCHASE_APPROVED','PURCHASE_COMPLETE','PURCHASE_REFUNDED','PURCHASE_CANCELED','PURCHASE_CHARGEBACK'):
+            ev['event']=kind
+            response=self.webhook(ev)
+            self.assertEqual(response.status_code,200)
+            self.assertEqual(response.json(),{'status':'test_received','access_granted':False})
+        self.assertEqual(len(self.db.users.docs),1)
+        self.assertEqual(self.db.hotmart_purchases.docs,[])
+        self.assertEqual(self.emails,[])
+        ev['data']['product'].pop('sku')
+        self.assertEqual(self.webhook(ev).status_code,403)
+        ev['data']['product'].update(id=999,sku='HTM_SANDBOX')
+        self.assertEqual(self.webhook(ev).status_code,403)
     def reset_token(self,index=-1):return re.search(r'#token=([A-Za-z0-9_-]+)',self.emails[index][2]).group(1)
     def test_recovery_hash_only_single_use_and_session_invalidation(self):
         jwt=self.token()
