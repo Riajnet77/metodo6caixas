@@ -32,7 +32,7 @@ export default function Diagnostico() {
   const answers = draft || record?.respostas;
   const result = draft ? summary(draft) : record?.resumo;
   return <div style={{background:'#f9f8f6', minHeight:'100vh'}}>
-    <nav className="p-4 bg-white border-b"><Link to="/">← Método 6 Caixas</Link></nav>
+    <nav className="p-4 bg-white border-b"><Link to="/inicio" aria-label="Voltar à página inicial do Método 6 Caixas">← Método 6 Caixas</Link></nav>
     {(!result || editing) ? <Questionario dadosIniciais={answers} onConcluir={submit} /> :
       <main className="max-w-xl mx-auto p-6 space-y-6">
         <h1 className="text-3xl font-bold">Seu diagnóstico financeiro</h1>

@@ -4,6 +4,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import PrivateRoute from './components/PrivateRoute';
 import Layout from './components/Layout';
 import Home from './pages/Home';
+import LandingPage from './pages/LandingPage';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import PasswordRecovery from './pages/PasswordRecovery';
@@ -23,6 +24,7 @@ import './App.css';
 function AppContent() {
   return (
     <Routes>
+      <Route path="/inicio" element={<LandingPage />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/esqueci-senha" element={<PasswordRecovery />} />
