@@ -41,15 +41,20 @@ export function MetodoGate({ children }) {
   if (record) return children;
   return <main className="max-w-2xl mx-auto py-10 px-4 space-y-6">
     <h1 className="text-3xl font-bold text-gray-900">Bem-vindo ao Método 6 Caixas</h1>
-    <p className="text-lg text-gray-600">Escolha por onde começar. O diagnóstico é opcional e ajuda a direcionar seus próximos passos com base nos valores que você informar.</p>
+    <p className="text-lg text-gray-600">Comece pelo passo a passo para conhecer o método e aprender a usar suas seis caixas. Se preferir, faça o diagnóstico ou abra o conteúdo completo.</p>
+    <Link to="/guia" className="block rounded-xl bg-amber-600 text-white p-6 hover:bg-amber-700">
+      <span className="block text-sm font-semibold mb-2">Comece por aqui</span>
+      <span className="block text-xl font-bold">Começar pelo passo a passo</span>
+      <span className="block mt-2">Conheça as caixas e aprenda a configurar sua renda, registrar gastos, acompanhar seu dinheiro e definir metas.</span>
+    </Link>
     <div className="grid gap-4 sm:grid-cols-2">
       <Link to="/diagnostico" className="rounded-xl border border-amber-300 bg-amber-50 p-6 hover:bg-amber-100">
-        <span className="block text-sm font-semibold text-amber-800 mb-2">Recomendado</span>
+        <span className="block text-sm font-semibold text-amber-800 mb-2">Opcional</span>
         <span className="block text-xl font-bold text-gray-900">Fazer meu diagnóstico</span>
         <span className="block mt-2 text-gray-700">Responda ao questionário para receber um direcionamento inicial.</span>
       </Link>
       <Link to="/ebook" className="rounded-xl border border-gray-300 bg-white p-6 hover:bg-gray-50">
-        <span className="block text-xl font-bold text-gray-900">Acessar o método agora</span>
+        <span className="block text-xl font-bold text-gray-900">Ler o conteúdo completo</span>
         <span className="block mt-2 text-gray-700">Abra o conteúdo completo sem responder ao questionário.</span>
       </Link>
     </div>

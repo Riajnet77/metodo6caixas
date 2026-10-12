@@ -27,6 +27,7 @@ const Layout = () => {
 
   const navigation = [
     { name: 'Início', href: '/', icon: LayoutDashboard },
+    { name: 'Passo a passo', href: '/guia', icon: BookOpen },
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
     { name: 'Configurações', href: '/configuracoes', icon: Settings },
     { name: 'Lançamentos', href: '/lancamentos', icon: PlusCircle },

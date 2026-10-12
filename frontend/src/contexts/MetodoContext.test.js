@@ -30,8 +30,10 @@ async function show(record) {
   axios.get.mockResolvedValue({data:record});
   await act(async () => {root.render(<App />);});
 }
-test('new account can choose diagnosis or direct content', async () => {
+test('new account can choose tutorial, optional diagnosis or complete content', async () => {
   await show(null);expect(container.textContent).toContain('Bem-vindo');
+  expect(container.querySelector('a[href="/guia"]')).not.toBeNull();
+  expect(container.textContent).toContain('Começar pelo passo a passo');
   expect(container.querySelector('a[href="/diagnostico"]')).not.toBeNull();
   expect(container.querySelector('a[href="/ebook"]')).not.toBeNull();
 });

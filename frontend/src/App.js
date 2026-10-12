@@ -33,6 +33,7 @@ function AppContent() {
       <Route path="/passo-zero" element={<PrivateRoute><EtapaZero /></PrivateRoute>} />
       <Route path="/" element={<PrivateRoute><Layout /></PrivateRoute>}>
         <Route index element={<MetodoGate><Home /></MetodoGate>} />
+        <Route path="guia" element={<Home />} />
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="configuracoes" element={<Configuracoes />} />
         <Route path="lancamentos" element={<Lancamentos />} />
