@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import axios from 'axios';
-import { Navigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 const Context = createContext(null);
 const API = `${process.env.REACT_APP_BACKEND_URL}/api/onboarding`;
@@ -37,9 +37,22 @@ export function MetodoStatus() {
   return <div className="p-8 text-center">{loading ? 'Carregando seu diagnóstico...' : <><p role="alert">{error}</p><button onClick={reload}>Tentar novamente</button></>}</div>;
 }
 export function MetodoGate({ children }) {
-  const { loading, error, record } = useMetodo();
-  if (loading || error) return <MetodoStatus />;
-  if (!record) return <Navigate to="/diagnostico" replace />;
-  if (record.resumo.perfil === 'endividado' && !record.passo_zero_concluido) return <Navigate to="/passo-zero" replace />;
-  return children;
+  const { record } = useMetodo();
+  if (record) return children;
+  return <main className="max-w-2xl mx-auto py-10 px-4 space-y-6">
+    <h1 className="text-3xl font-bold text-gray-900">Bem-vindo ao Método 6 Caixas</h1>
+    <p className="text-lg text-gray-600">Escolha por onde começar. O diagnóstico é opcional e ajuda a direcionar seus próximos passos com base nos valores que você informar.</p>
+    <div className="grid gap-4 sm:grid-cols-2">
+      <Link to="/diagnostico" className="rounded-xl border border-amber-300 bg-amber-50 p-6 hover:bg-amber-100">
+        <span className="block text-sm font-semibold text-amber-800 mb-2">Recomendado</span>
+        <span className="block text-xl font-bold text-gray-900">Fazer meu diagnóstico</span>
+        <span className="block mt-2 text-gray-700">Responda ao questionário para receber um direcionamento inicial.</span>
+      </Link>
+      <Link to="/ebook" className="rounded-xl border border-gray-300 bg-white p-6 hover:bg-gray-50">
+        <span className="block text-xl font-bold text-gray-900">Acessar o método agora</span>
+        <span className="block mt-2 text-gray-700">Abra o conteúdo completo sem responder ao questionário.</span>
+      </Link>
+    </div>
+    <p className="text-gray-600">Você pode fazer o diagnóstico depois pelo menu “Meu diagnóstico”. Para começar seu controle financeiro, <Link to="/configuracoes" className="underline text-amber-800">configure suas seis caixas</Link>.</p>
+  </main>;
 }

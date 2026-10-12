@@ -31,8 +31,8 @@ function AppContent() {
       <Route path="/redefinir-senha" element={<PasswordRecovery reset />} />
       <Route path="/diagnostico" element={<Diagnostico />} />
       <Route path="/passo-zero" element={<PrivateRoute><EtapaZero /></PrivateRoute>} />
-      <Route path="/" element={<PrivateRoute><MetodoGate><Layout /></MetodoGate></PrivateRoute>}>
-        <Route index element={<Home />} />
+      <Route path="/" element={<PrivateRoute><Layout /></PrivateRoute>}>
+        <Route index element={<MetodoGate><Home /></MetodoGate>} />
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="configuracoes" element={<Configuracoes />} />
         <Route path="lancamentos" element={<Lancamentos />} />

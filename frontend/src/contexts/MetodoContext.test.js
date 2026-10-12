@@ -30,20 +30,22 @@ async function show(record) {
   axios.get.mockResolvedValue({data:record});
   await act(async () => {root.render(<App />);});
 }
-test('new account starts with questionnaire', async () => {
-  await show(null);expect(container.textContent).toContain('Questionário');
+test('new account can choose diagnosis or direct content', async () => {
+  await show(null);expect(container.textContent).toContain('Bem-vindo');
+  expect(container.querySelector('a[href="/diagnostico"]')).not.toBeNull();
+  expect(container.querySelector('a[href="/ebook"]')).not.toBeNull();
 });
-test('deficit directs to Passo Zero until completion', async () => {
+test('deficit does not block access to purchased method', async () => {
   await show({resumo:{perfil:'endividado'},passo_zero_concluido:false});
-  expect(container.textContent).toContain('Passo Zero');
+  expect(container.textContent).toContain('Área do método');
 });
 test('completed account can access method', async () => {
   await show({resumo:{perfil:'endividado'},passo_zero_concluido:true});
   expect(container.textContent).toContain('Área do método');
 });
-test('server error shows retry and does not grant access', async () => {
+test('diagnosis unavailable still offers direct content', async () => {
   axios.get.mockRejectedValue(new Error('offline'));
   await act(async () => {root.render(<App />);});
-  expect(container.textContent).toContain('Tentar novamente');
+  expect(container.querySelector('a[href="/ebook"]')).not.toBeNull();
   expect(container.textContent).not.toContain('Área do método');
 });
