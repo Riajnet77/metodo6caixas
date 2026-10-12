@@ -34,7 +34,7 @@ const LandingPage = () => {
         <a href={checkout_url || "/diagnostico"} style={{ display: 'inline-block', background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: '#000', fontSize: 18, fontWeight: 800, padding: '18px 48px', borderRadius: 12, textDecoration: 'none', boxShadow: '0 8px 32px rgba(245,158,11,0.4)' }}>
           {checkout_url ? "Quero organizar minhas finanças →" : "Começar pelo diagnóstico gratuito →"}
         </a>
-        <p style={{ marginTop: 16, fontSize: 14, color: '#525252' }}>R$ 97,00 — ou 10x de R$ 9,70 no cartão</p>
+        <p style={{ marginTop: 16, fontSize: 14, color: '#525252' }}>R$ 97,00 à vista — ou em até 10x com juros no cartão</p>
       </section>
 
       {/* DIAGNÓSTICO GRATUITO */}
@@ -143,9 +143,9 @@ const LandingPage = () => {
           <p style={{ fontSize: 16, color: '#525252', textDecoration: 'line-through', marginBottom: 8 }}>De R$ 197,00</p>
           <p style={{ fontSize: 14, color: '#a3a3a3', marginBottom: 4 }}>Por apenas</p>
           <div style={{ fontSize: 64, fontWeight: 900, color: '#f59e0b', lineHeight: 1, letterSpacing: '-0.02em', marginBottom: 8 }}>R$ 97</div>
-          <p style={{ fontSize: 16, color: '#a3a3a3', marginBottom: 32 }}>ou <strong style={{ color: '#fff' }}>10x de R$ 9,70</strong> no cartão</p>
+          <p style={{ fontSize: 16, color: '#a3a3a3', marginBottom: 32 }}>ou <strong style={{ color: '#fff' }}>até 10x com juros</strong> no cartão</p>
           <ul style={{ listStyle: 'none', marginBottom: 32, textAlign: 'left' }}>
-            {['Sistema completo Método 6 Caixas', 'Dashboard com gráficos em tempo real', 'Lançamentos e controle de gastos', 'Metas financeiras personalizadas', '13 capítulos de conteúdo educativo', 'Diagnóstico financeiro gratuito', 'Acesso vitalício — sem mensalidade'].map((item, i) => (
+            {['Sistema completo Método 6 Caixas', 'Dashboard com gráficos em tempo real', 'Lançamentos e controle de gastos', 'Metas financeiras personalizadas', '13 capítulos de conteúdo educativo', 'Diagnóstico financeiro gratuito', 'Pagamento único — sem mensalidade'].map((item, i) => (
               <li key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 15, color: '#d4d4d4', padding: '8px 0', borderBottom: '1px solid #1a1a1a' }}>
                 <span style={{ color: '#f59e0b' }}>✓</span> {item}
               </li>
@@ -175,7 +175,7 @@ const LandingPage = () => {
           { p: 'É um aplicativo ou um curso?', r: 'É um sistema completo: uma plataforma online onde você registra seus gastos, acompanha gráficos e lê o conteúdo educativo — tudo em um só lugar.' },
           { p: 'Como acesso após a compra?', r: 'Após o pagamento, você recebe um email com seu link de acesso. É só criar sua conta e começar a usar imediatamente.' },
           { p: 'Funciona no celular?', r: 'Sim! O sistema é 100% responsivo e funciona perfeitamente em qualquer dispositivo — celular, tablet ou computador.' },
-          { p: 'Precisa pagar mensalidade?', r: 'Não. É um pagamento único e você tem acesso vitalício. Sem mensalidade, sem assinatura.' },
+          { p: 'Precisa pagar mensalidade?', r: 'Não. A oferta atual é de pagamento único, sem mensalidade ou assinatura.' },
         ].map((faq, i) => (
           <div key={i} style={{ borderBottom: '1px solid #e5e5e5', padding: '20px 0' }}>
             <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 8 }}>{faq.p}</h3>
@@ -193,7 +193,7 @@ const LandingPage = () => {
         <a href={checkout_url || "/diagnostico"} style={{ display: 'inline-block', background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: '#000', fontSize: 18, fontWeight: 800, padding: '18px 48px', borderRadius: 12, textDecoration: 'none', boxShadow: '0 8px 32px rgba(245,158,11,0.4)' }}>
           {checkout_url ? "Começar agora por R$ 97,00 →" : "Fazer diagnóstico gratuito →"}
         </a>
-        <p style={{ marginTop: 16, fontSize: 14, color: '#525252' }}>ou 10x de R$ 9,70 • Garantia de 7 dias • Acesso imediato</p>
+        <p style={{ marginTop: 16, fontSize: 14, color: '#525252' }}>ou até 10x com juros • Garantia de 7 dias • Acesso após aprovação do pagamento</p>
       </section>
 
       {/* FOOTER */}
